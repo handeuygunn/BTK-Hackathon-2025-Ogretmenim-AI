@@ -1,155 +1,107 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Öğretmenim AI - Ana Sayfa</title>
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .teacher-panel {
-            position: fixed;
-            top: 2.5vw;
-            right: 3vw;
-            background: rgba(255,255,255,0.95);
-            box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.13);
-            border-radius: 1.2rem;
-            padding: 1rem 2rem;
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: #2575fc;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-        }
-        .teacher-panel .icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #e3e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            color: #6a11cb;
-        }
-        .container-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 2vw;
-            width: 70vw;
-            height: 65vh;
-            max-width: 1100px;
-            max-height: 600px;
-        }
-        .card {
-            background: #fff;
-            border-radius: 1.2rem;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.18s, box-shadow 0.18s;
-            position: relative;
-            overflow: hidden;
-            min-width: 0;
-        }
-        .card:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.18);
-        }
-        .card img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-            background: #e3e8f0;
-        }
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2575fc;
-            text-align: center;
-            margin-bottom: 0.1rem;
-        }
-        @media (max-width: 900px) {
-            .container-grid {
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: repeat(3, 1fr);
-                gap: 3vw;
-                width: 95vw;
-                height: 80vh;
-            }
-            .teacher-panel {
-                top: 1.5vw;
-                right: 2vw;
-                padding: 0.7rem 1.2rem;
-                font-size: 1rem;
-            }
-        }
-        @media (max-width: 600px) {
-            .container-grid {
-                grid-template-columns: 1fr;
-                grid-template-rows: repeat(6, 1fr);
-                gap: 4vw;
-                width: 100vw;
-                height: auto;
-                max-height: none;
-            }
-            .card {
-                min-height: 100px;
-            }
-            .teacher-panel {
-                top: 1vw;
-                right: 1vw;
-                padding: 0.5rem 0.7rem;
-                font-size: 0.95rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="teacher-panel">
-        <span class="icon">👩‍🏫</span>
-        <span>Hoşgeldiniz, <b>Ayşe Öğretmen</b></span>
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="stylesheet" href="/static/css/chatbot.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-title">
+        <i class="fas fa-graduation-cap" style="margin-right: 10px"></i>
+        Öğretmenim AI
+      </div>
+      <div class="teacher-panel">
+        <div class="icon">👩‍🏫</div>
+        <span>Hoşgeldiniz, <strong>Ayşe Öğretmen</strong></span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="container-grid">
+        <div class="card" onclick="openChatbot('Günlük Plan')">
+          <div class="card-icon">📅</div>
+          <div class="card-title">Günlük Plan</div>
+          <div class="card-description">
+            Günlük eğitim planlarınızı oluşturun
+          </div>
+        </div>
+
+        <div class="card" onclick="openChatbot('Etkinlik/Oyun Planı')">
+          <div class="card-icon">🎮</div>
+          <div class="card-title">Etkinlik/Oyun Planı</div>
+          <div class="card-description">
+            Eğlenceli etkinlik ve oyunlar planlayın
+          </div>
+        </div>
+
+        <div class="card" onclick="openChatbot('Boyama/Çalışma Sayfaları')">
+          <div class="card-icon">🎨</div>
+          <div class="card-title">Boyama/Çalışma Sayfaları</div>
+          <div class="card-description">
+            Yaratıcı çalışma sayfaları hazırlayın
+          </div>
+        </div>
+
+        <div class="card" onclick="openChatbot('Öğrenci Analizleri')">
+          <div class="card-icon">📊</div>
+          <div class="card-title">Öğrenci Analizleri</div>
+          <div class="card-description">Öğrenci gelişimini takip edin</div>
+        </div>
+
+        <div class="card" onclick="openChatbot('Hikayeler')">
+          <div class="card-icon">📚</div>
+          <div class="card-title">Hikayeler</div>
+          <div class="card-description">Eğitici hikayeler oluşturun</div>
+        </div>
+
+        <div class="card" onclick="openChatbot('Takvim')">
+          <div class="card-icon">🗓️</div>
+          <div class="card-title">Takvim</div>
+          <div class="card-description">Etkinlik takvimini yönetin</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Chatbot Modal -->
+    <div id="chatbot-modal" class="chatbot-modal">
+      <div class="chatbot-container">
+        <div class="chatbot-header">
+          <div class="chatbot-title">
+            <span id="chatbot-title-text">🤖 AI Asistan</span>
+          </div>
+          <button class="close-btn" onclick="closeChatbot()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div id="chat-messages" class="chat-messages">
+          <!-- Mesajlar buraya eklenecek -->
+        </div>
+
+        <div class="chat-input-area">
+          <div class="input-container">
+            <textarea
+              id="chat-input"
+              class="chat-input"
+              placeholder="Mesajınızı yazın..."
+              onkeypress="handleKeyPress(event)"
+              oninput="autoResizeTextarea(this)"
+              maxlength="2000"
+            ></textarea>
+            <button id="send-btn" class="send-btn" onclick="sendMessage()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="container-grid">
-        <div class="card" onclick="alert('Günlük Plan tıklandı!')">
-            <img src="https://via.placeholder.com/80?text=1" alt="Günlük Plan">
-            <div class="card-title">Günlük Plan</div>
-        </div>
-        <div class="card" onclick="alert('Etkinlik/Oyun Planı tıklandı!')">
-            <img src="https://via.placeholder.com/80?text=2" alt="Etkinlik/Oyun Planı">
-            <div class="card-title">Etkinlik/Oyun Planı</div>
-        </div>
-        <div class="card" onclick="alert('Boyama/Çalışma Sayfaları tıklandı!')">
-            <img src="https://via.placeholder.com/80?text=3" alt="Boyama/Çalışma Sayfaları">
-            <div class="card-title">Boyama/Çalışma Sayfaları</div>
-        </div>
-        <div class="card" onclick="alert('Öğrenci Analizleri tıklandı!')">
-            <img src="https://via.placeholder.com/80?text=4" alt="Öğrenci Analizleri">
-            <div class="card-title">Öğrenci Analizleri</div>
-        </div>
-        <div class="card" onclick="alert('Hikayeler tıklandı!')">
-            <img src="https://via.placeholder.com/80?text=5" alt="Hikayeler">
-            <div class="card-title">Hikayeler</div>
-        </div>
-        <div class="card" onclick="alert('Takvim tıklandı!')">
-            <img src="https://via.placeholder.com/80?text=6" alt="Takvim">
-            <div class="card-title">Takvim</div>
-        </div>
-    </div>
-</body>
+    <script src="/static/js/chatbot.js"></script>
+  </body>
 </html>
