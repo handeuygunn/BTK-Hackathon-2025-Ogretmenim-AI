@@ -40,8 +40,7 @@
             Eğlenceli etkinlik ve oyunlar planlayın
           </div>
         </div>
-
-        <div class="card" onclick="openChatbot('Boyama/Çalışma Sayfaları')">
+        <div class="card" onclick="window.location.href='/boyama-sayfasi'">
           <div class="card-icon">🎨</div>
           <div class="card-title">Boyama/Çalışma Sayfaları</div>
           <div class="card-description">
@@ -54,24 +53,42 @@
           <div class="card-title">Öğrenci Analizleri</div>
           <div class="card-description">Öğrenci gelişimini takip edin</div>
         </div>
-
         <div class="card" onclick="openChatbot('Hikayeler')">
           <div class="card-icon">📚</div>
           <div class="card-title">Hikayeler</div>
           <div class="card-description">Eğitici hikayeler oluşturun</div>
         </div>
-
-        <div class="card" onclick="openChatbot('Takvim')">
-          <div class="card-icon">🗓️</div>
-          <div class="card-title">Takvim</div>
-          <div class="card-description">Etkinlik takvimini yönetin</div>
+        <div class="card calendar-card">
+          <div class="calendar-header">
+            <button class="nav-btn" onclick="previousMonth()">‹</button>
+            <div class="calendar-title">
+              <span id="month-year"></span>
+            </div>
+            <button class="nav-btn" onclick="nextMonth()">›</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-weekdays">
+              <div class="weekday">Paz</div>
+              <div class="weekday">Pzt</div>
+              <div class="weekday">Sal</div>
+              <div class="weekday">Çar</div>
+              <div class="weekday">Per</div>
+              <div class="weekday">Cum</div>
+              <div class="weekday">Cmt</div>
+            </div>
+            <div class="calendar-days" id="calendar-days">
+              <!-- Günler buraya dinamik olarak eklenecek -->
+            </div>
+          </div>
+          <div class="calendar-footer">
+            <button class="today-btn" onclick="goToToday()">Bugün</button>
+          </div>
         </div>
       </div>
     </main>
-
     <!-- Chatbot Modal -->
     <div id="chatbot-modal" class="chatbot-modal">
-      <div class="chatbot-container">
+      <div class="chatbot-container" id="chatbot-container">
         <div class="chatbot-header">
           <div class="chatbot-title">
             <span id="chatbot-title-text">🤖 AI Asistan</span>
@@ -81,27 +98,43 @@
           </button>
         </div>
 
-        <div id="chat-messages" class="chat-messages">
-          <!-- Mesajlar buraya eklenecek -->
-        </div>
+        <div class="chatbot-content" id="chatbot-content">
+          <div class="chat-section" id="chat-section">
+            <div id="chat-messages" class="chat-messages">
+              <!-- Mesajlar buraya eklenecek -->
+            </div>
 
-        <div class="chat-input-area">
-          <div class="input-container">
-            <textarea
-              id="chat-input"
-              class="chat-input"
-              placeholder="Mesajınızı yazın..."
-              onkeypress="handleKeyPress(event)"
-              oninput="autoResizeTextarea(this)"
-              maxlength="2000"
-            ></textarea>
-            <button id="send-btn" class="send-btn" onclick="sendMessage()">
-              <i class="fas fa-paper-plane"></i>
-            </button>
+            <div class="chat-input-area">
+              <div class="input-container">
+                <textarea
+                  id="chat-input"
+                  class="chat-input"
+                  placeholder="Mesajınızı yazın..."
+                  onkeypress="handleKeyPress(event)"
+                  oninput="autoResizeTextarea(this)"
+                  maxlength="2000"
+                ></textarea>
+                <button id="send-btn" class="send-btn" onclick="sendMessage()">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="story-display" id="story-display" style="display: none">
+            <div class="story-header">
+              <h2 id="content-display-title">📚 Hikaye</h2>
+              <button class="story-action-btn" onclick="copyContent()">
+                <i class="fas fa-copy"></i> Kopyala
+              </button>
+            </div>
+            <div class="story-content" id="story-content">
+              <!-- İçerik buraya gelecek -->
+            </div>
           </div>
         </div>
       </div>
     </div>
     <script src="/static/js/chatbot.js"></script>
+    <script src="/static/js/calendar.js"></script>
   </body>
 </html>
