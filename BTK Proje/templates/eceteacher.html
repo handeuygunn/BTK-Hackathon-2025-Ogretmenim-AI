@@ -25,7 +25,7 @@
 
     <main class="main-content">
       <div class="container-grid">
-        <div class="card" onclick="openChatbot('Günlük Plan')">
+        <div class="card" onclick="window.location.href='/gunluk-plan'">
           <div class="card-icon">📅</div>
           <div class="card-title">Günlük Plan</div>
           <div class="card-description">
@@ -47,8 +47,7 @@
             Yaratıcı çalışma sayfaları hazırlayın
           </div>
         </div>
-
-        <div class="card" onclick="openChatbot('Öğrenci Analizleri')">
+        <div class="card" onclick="window.location.href='/ogrenci-analizleri'">
           <div class="card-icon">📊</div>
           <div class="card-title">Öğrenci Analizleri</div>
           <div class="card-description">Öğrenci gelişimini takip edin</div>
@@ -119,13 +118,17 @@
                 </button>
               </div>
             </div>
-          </div>
-          <div class="story-display" id="story-display" style="display: none">
+          </div>          <div class="story-display" id="story-display" style="display: none">
             <div class="story-header">
               <h2 id="content-display-title">📚 Hikaye</h2>
-              <button class="story-action-btn" onclick="copyContent()">
-                <i class="fas fa-copy"></i> Kopyala
-              </button>
+              <div class="story-actions">
+                <button class="story-action-btn" onclick="copyContent()">
+                  <i class="fas fa-copy"></i> Kopyala
+                </button>
+                <button class="story-action-btn" onclick="exportContentToPDF()">
+                  <i class="fas fa-file-pdf"></i> PDF
+                </button>
+              </div>
             </div>
             <div class="story-content" id="story-content">
               <!-- İçerik buraya gelecek -->

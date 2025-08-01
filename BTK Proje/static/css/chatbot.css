@@ -94,6 +94,11 @@
   font-weight: 700;
 }
 
+.story-actions {
+  display: flex;
+  gap: 1rem;
+}
+
 .story-action-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -675,6 +680,11 @@
 
   .story-header h2 {
     font-size: 1.2rem;
+  }
+
+  .story-actions {
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 
   .story-action-btn {

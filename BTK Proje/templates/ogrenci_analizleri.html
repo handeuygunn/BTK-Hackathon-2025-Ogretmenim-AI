@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Öğrenci Analizleri - Öğretmenim AI</title>
+    <link rel="stylesheet" href="/static/css/ogrenci_analizleri.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <button class="back-btn" onclick="window.location.href='/dashboard'">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-title">
+          <i class="fas fa-chart-line" style="margin-right: 10px"></i>
+          Öğrenci Analizleri
+        </div>
+      </div>
+      <div class="teacher-panel">
+        <div class="icon">👩‍🏫</div>
+        <span><strong>Ayşe Öğretmen</strong></span>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <!-- Sol Panel - Öğrenci Listesi -->
+      <div class="students-panel">
+        <div class="panel-header">
+          <h3><i class="fas fa-users"></i> Öğrencilerim</h3>
+          <div class="search-container">
+            <input
+              type="text"
+              id="student-search"
+              placeholder="Öğrenci ara..."
+            />
+            <i class="fas fa-search"></i>
+          </div>
+        </div>
+        <div class="students-list" id="students-list">
+          <!-- Öğrenciler dinamik olarak yüklenecek -->
+        </div>
+      </div>
+
+      <!-- Sağ Panel - Öğrenci Analiz Alanı -->
+      <div class="analysis-panel">
+        <div class="welcome-state" id="welcome-state">
+          <div class="welcome-content">
+            <i class="fas fa-user-graduate"></i>
+            <h3>Öğrenci Analizi</h3>
+            <p>Bir öğrenci seçerek analizine başlayın</p>
+          </div>
+        </div>
+
+        <div
+          class="student-analysis"
+          id="student-analysis"
+          style="display: none"
+        >
+          <div class="student-header">
+            <div class="student-avatar">
+              <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="student-info">
+              <h3 id="selected-student-name">Öğrenci Adı</h3>
+              <span id="selected-student-age">5 yaş</span>
+            </div>
+          </div>
+
+          <div class="analysis-tabs">
+            <button class="tab-btn active" onclick="switchTab('chat')">
+              <i class="fas fa-comments"></i> Analiz Sohbeti
+            </button>
+            <button class="tab-btn" onclick="switchTab('notes')">
+              <i class="fas fa-sticky-note"></i> Gözlemler
+            </button>
+            <button class="tab-btn" onclick="switchTab('progress')">
+              <i class="fas fa-chart-bar"></i> Gelişim
+            </button>
+          </div>
+
+          <!-- Chat Tab -->
+          <div class="tab-content active" id="chat-tab">
+            <div class="chat-container">
+              <div class="chat-messages" id="chat-messages">
+                <div class="chat-message bot-message">
+                  <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                  </div>
+                  <div class="message-content">
+                    <p>
+                      Merhaba! Bu öğrenci hakkında ne öğrenmek istiyorsunuz?
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-container">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    id="chat-input"
+                    placeholder="Öğrenci hakkında soru sorun..."
+                  />
+                  <button id="send-btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Tab -->
+          <div class="tab-content" id="notes-tab">
+            <div class="notes-container">
+              <div class="notes-header">
+                <h4>Gözlemlerim</h4>
+                <button class="add-note-btn" onclick="addNewNote()">
+                  <i class="fas fa-plus"></i> Yeni Gözlem
+                </button>
+              </div>
+              <div class="notes-list" id="notes-list">
+                <!-- Notlar dinamik olarak yüklenecek -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Tab -->
+          <div class="tab-content" id="progress-tab">
+            <div class="progress-container">
+              <h4>Gelişim Takibi</h4>
+              <div class="progress-cards">
+                <div class="progress-card">
+                  <div class="progress-icon">🎨</div>
+                  <div class="progress-info">
+                    <h5>Yaratıcılık</h5>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <span>İyi</span>
+                  </div>
+                </div>
+                <div class="progress-card">
+                  <div class="progress-icon">🗣️</div>
+                  <div class="progress-info">
+                    <h5>İletişim</h5>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <span>Orta</span>
+                  </div>
+                </div>
+                <div class="progress-card">
+                  <div class="progress-icon">🤝</div>
+                  <div class="progress-info">
+                    <h5>Sosyal Beceriler</h5>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                    <span>Çok İyi</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div class="modal" id="note-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4>Yeni Gözlem Ekle</h4>
+          <button class="close-btn" onclick="closeNoteModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <textarea
+            id="note-text"
+            placeholder="Gözleminizi buraya yazın..."
+          ></textarea>
+          <div class="note-categories">
+            <label>Kategori:</label>
+            <select id="note-category">
+              <option value="genel">Genel</option>
+              <option value="sosyal">Sosyal Beceriler</option>
+              <option value="akademik">Akademik</option>
+              <option value="yaraticilik">Yaratıcılık</option>
+              <option value="davranis">Davranış</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" onclick="closeNoteModal()">İptal</button>
+          <button class="save-btn" onclick="saveNote()">Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/ogrenci_analizleri.js"></script>
+  </body>
+</html>

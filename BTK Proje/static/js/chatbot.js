@@ -301,6 +301,162 @@ function copyContent() {
     });
 }
 
+// İçeriği PDF olarak dışa aktar
+function exportContentToPDF() {
+  const storyContent = document.getElementById("story-content");
+  const titleElement = document.getElementById("content-display-title");
+  
+  if (!storyContent || !storyContent.innerHTML.trim()) {
+    alert("Dışa aktarılacak içerik bulunamadı.");
+    return;
+  }
+
+  const title = titleElement ? titleElement.textContent : "İçerik";
+  const content = storyContent.innerHTML;
+  
+  // Bugünün tarihini al
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('tr-TR');
+  
+  // Print penceresi aç
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>${title} - ${dateStr}</title>
+        <meta charset="UTF-8">
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6;
+            color: #2d3748;
+          }
+          h1, h2, h3 { 
+            color: #667eea; 
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+          }
+          h1 { 
+            border-bottom: 2px solid #667eea; 
+            padding-bottom: 10px; 
+            font-size: 2rem;
+          }
+          h2 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 5px;
+          }
+          h3 {
+            font-size: 1.3rem;
+          }
+          ul, ol { 
+            margin: 10px 0; 
+            padding-left: 30px; 
+          }
+          li { 
+            margin-bottom: 8px; 
+          }
+          strong { 
+            font-weight: bold; 
+            color: #2d3748;
+          }
+          em {
+            font-style: italic;
+            color: #667eea;
+          }
+          p {
+            margin-bottom: 1rem;
+            text-align: justify;
+          }
+          .activity-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+          }
+          .activity-title {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+          }
+          .activity-detail {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            border-left: 4px solid #667eea;
+          }
+          .step-number {
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+          }
+          .material-list {
+            background: rgba(118, 75, 162, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+          }
+          .time-badge, .age-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin: 2px;
+            display: inline-block;
+          }
+          .age-badge {
+            background: #48bb78;
+          }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+          }
+          .date {
+            color: #718096;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${title}</h1>
+          <div class="date">Oluşturulma Tarihi: ${dateStr}</div>
+        </div>
+        <div class="content">
+          ${content}
+        </div>
+      </body>
+    </html>
+  `);
+  
+  printWindow.document.close();
+  
+  // Kısa bir gecikme sonrasında print dialog'unu aç
+  setTimeout(() => {
+    printWindow.print();
+  }, 250);
+}
+
 // Etkinlik/Oyun planını formatla ve görüntüle
 function displayActivity(activityText) {
   const storyContent = document.getElementById("story-content");

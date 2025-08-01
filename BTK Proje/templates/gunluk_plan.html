@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Günlük Plan - Öğretmenim AI</title>
+    <link rel="stylesheet" href="/static/css/gunluk_plan.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <button class="back-btn" onclick="window.location.href='/dashboard'">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-title">
+          <i class="fas fa-calendar-alt" style="margin-right: 10px"></i>
+          Günlük Plan Oluşturucu
+        </div>
+      </div>
+      <div class="teacher-panel">
+        <div class="icon">👩‍🏫</div>
+        <span><strong>Ayşe Öğretmen</strong></span>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <!-- Sol Panel - Chat ve PDF Yükleme -->
+      <div class="chat-panel">
+        <div class="panel-header">
+          <h3><i class="fas fa-comments"></i> Plan Asistanı</h3>
+        </div>
+
+        <!-- PDF Yükleme Alanı -->
+        <div class="pdf-upload-section">
+          <div class="upload-area" id="upload-area">
+            <div class="upload-content">
+              <i class="fas fa-file-pdf"></i>
+              <p>
+                PDF dosyasını buraya sürükleyin veya
+                <span class="upload-link">seçin</span>
+              </p>
+              <input
+                type="file"
+                id="pdf-input"
+                accept=".pdf"
+                style="display: none"
+              />
+            </div>
+          </div>
+          <div class="uploaded-files" id="uploaded-files"></div>
+        </div>
+
+        <!-- Chat Alanı -->
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-message bot-message">
+              <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+              </div>
+              <div class="message-content">
+                <p>
+                  Merhaba! Günlük planınızı oluşturmak için yardımcı olacağım.
+                  PDF dosyası yükleyebilir veya doğrudan mesaj yazabilirsiniz.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-container">
+            <div class="input-group">
+              <input
+                type="text"
+                id="chat-input"
+                placeholder="Günlük plan için talebinizi yazın... (örn: Yarın için 4-5 yaş grubu matematik etkinlikleri)"
+              />
+              <button id="send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sağ Panel - Plan Çıktısı ve Takvim -->
+      <div class="output-panel">
+        <!-- Plan Çıktısı -->
+        <div class="plan-output-section">
+          <div class="output-header">
+            <h3><i class="fas fa-clipboard-list"></i> Günlük Plan</h3>
+            <div class="output-actions">
+              <button
+                class="action-btn"
+                id="save-plan-btn"
+                onclick="savePlan()"
+                style="display: none"
+              >
+                <i class="fas fa-save"></i> Kaydet
+              </button>
+              <button
+                class="action-btn"
+                id="export-pdf-btn"
+                onclick="exportToPDF()"
+                style="display: none"
+              >
+                <i class="fas fa-file-pdf"></i> PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="plan-content" id="plan-content">
+            <div class="welcome-state">
+              <i class="fas fa-calendar-check"></i>
+              <h4>Plan Oluşturmaya Başlayın</h4>
+              <p>
+                Sol panelden tarih seçip talep göndererek günlük planınızı
+                oluşturun
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini Takvim -->
+        <div class="mini-calendar-section">
+          <div class="calendar-header">
+            <h4><i class="fas fa-calendar"></i> Takvim</h4>
+            <div class="calendar-nav">
+              <button onclick="previousMonth()">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span id="calendar-month-year"></span>
+              <button onclick="nextMonth()">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="mini-calendar">
+            <div class="calendar-weekdays">
+              <div>Pz</div>
+              <div>Pt</div>
+              <div>Sa</div>
+              <div>Ça</div>
+              <div>Pe</div>
+              <div>Cu</div>
+              <div>Ct</div>
+            </div>
+            <div class="calendar-days" id="calendar-days">
+              <!-- Günler dinamik olarak yüklenecek -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Kayıtlı Planlar -->
+        <div class="saved-plans-section">
+          <div class="section-header">
+            <h4><i class="fas fa-history"></i> Kayıtlı Planlar</h4>
+          </div>
+          <div class="saved-plans-list" id="saved-plans-list">
+            <!-- Kayıtlı planlar dinamik olarak yüklenecek -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Kaydetme Modal -->
+    <div class="modal" id="save-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4>Planı Kaydet</h4>
+          <button class="close-btn" onclick="closeSaveModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="plan-title">Plan Başlığı:</label>
+            <input
+              type="text"
+              id="plan-title"
+              placeholder="Örn: 4-5 Yaş Matematik Etkinlikleri"
+            />
+          </div>
+          <div class="form-group">
+            <label for="plan-date-save">Tarih:</label>
+            <input type="date" id="plan-date-save" />
+          </div>
+          <div class="form-group">
+            <label for="plan-time-range">Saat Aralığı:</label>
+            <div class="time-inputs">
+              <input type="time" id="start-time" value="09:00" />
+              <span>-</span>
+              <input type="time" id="end-time" value="17:00" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="plan-notes">Notlar (Opsiyonel):</label>
+            <textarea id="plan-notes" placeholder="Ek notlar..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" onclick="closeSaveModal()">İptal</button>
+          <button class="save-btn" onclick="confirmSavePlan()">Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/gunluk_plan.js"></script>
+  </body>
+</html>
