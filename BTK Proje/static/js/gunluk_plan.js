@@ -16,18 +16,18 @@ document.addEventListener("DOMContentLoaded", function () {
 // Sayfayı başlat
 async function initializePage() {
   // Dashboard'dan gelen düzenleme tarihi kontrolü
-  const editPlanDate = localStorage.getItem('editPlanDate');
+  const editPlanDate = localStorage.getItem("editPlanDate");
   let selectedDate;
-  
+
   if (editPlanDate) {
     // Dashboard'dan gelen tarih varsa onu kullan
     selectedDate = editPlanDate;
-    localStorage.removeItem('editPlanDate'); // Kullandıktan sonra temizle
+    localStorage.removeItem("editPlanDate"); // Kullandıktan sonra temizle
   } else {
     // Yoksa bugünün tarihini kullan
     selectedDate = new Date().toISOString().split("T")[0];
   }
-  
+
   // Kaydetme modal'ındaki tarihi seç
   document.getElementById("plan-date-save").value = selectedDate;
 
@@ -36,7 +36,9 @@ async function initializePage() {
 
   // Eğer seçili tarih için plan varsa yükle
   if (editPlanDate) {
-    const existingPlan = savedPlans.find(plan => plan.plan_date === editPlanDate);
+    const existingPlan = savedPlans.find(
+      (plan) => plan.plan_date === editPlanDate
+    );
     if (existingPlan) {
       // Planı chat area'ya yükle
       displayExistingPlan(existingPlan);
@@ -534,6 +536,16 @@ function nextMonth() {
 // Kayıtlı planları yükle
 async function loadSavedPlans() {
   try {
+    const savedPlansList = document.getElementById("saved-plans-list");
+    
+    // Loading göster
+    savedPlansList.innerHTML = `
+      <div style="text-align: center; color: #718096; padding: 2rem;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #667eea;"></i>
+        <p style="font-size: 0.9rem;">Planlar yükleniyor...</p>
+      </div>
+    `;
+
     // API'den kayıtlı planları çek
     const response = await fetch("/api/get-daily-plans", {
       method: "GET",
@@ -544,14 +556,14 @@ async function loadSavedPlans() {
 
     const data = await response.json();
 
-    const savedPlansList = document.getElementById("saved-plans-list");
     savedPlansList.innerHTML = "";
 
     if (!data.success || data.plans.length === 0) {
       savedPlansList.innerHTML = `
         <div style="text-align: center; color: #718096; padding: 2rem;">
           <i class="fas fa-calendar-check" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;"></i>
-          <p>Henüz kayıtlı plan yok.</p>
+          <p style="font-size: 0.95rem; margin-bottom: 0.25rem;">Henüz kayıtlı plan yok</p>
+          <p style="font-size: 0.8rem; opacity: 0.7;">İlk planınızı oluşturun</p>
         </div>
       `;
       savedPlans = [];
@@ -566,21 +578,85 @@ async function loadSavedPlans() {
       (a, b) => new Date(b.plan_date) - new Date(a.plan_date)
     );
 
-    sortedPlans.slice(0, 5).forEach((plan) => {
-      // Son 5 planı göster
+    // Son 8 planı göster (daha fazla gösteriyoruz)
+    sortedPlans.slice(0, 8).forEach((plan, index) => {
       const planItem = createSavedPlanItem(plan);
+      // Animasyon için delay ekle
+      planItem.style.opacity = '0';
+      planItem.style.transform = 'translateY(10px)';
       savedPlansList.appendChild(planItem);
+      
+      setTimeout(() => {
+        planItem.style.transition = 'all 0.3s ease';
+        planItem.style.opacity = '1';
+        planItem.style.transform = 'translateY(0)';
+      }, index * 50);
     });
+
+    // Eğer 8'den fazla plan varsa "Daha fazla" linki ekle
+    if (sortedPlans.length > 8) {
+      const moreDiv = document.createElement("div");
+      moreDiv.style.textAlign = "center";
+      moreDiv.style.padding = "1rem";
+      moreDiv.innerHTML = `
+        <span style="color: #667eea; font-size: 0.9rem; cursor: pointer;" onclick="showAllPlans()">
+          <i class="fas fa-chevron-down" style="margin-right: 0.5rem;"></i>
+          ${sortedPlans.length - 8} plan daha göster
+        </span>
+      `;
+      savedPlansList.appendChild(moreDiv);
+    }
+
   } catch (error) {
     console.error("Load saved plans error:", error);
     const savedPlansList = document.getElementById("saved-plans-list");
     savedPlansList.innerHTML = `
       <div style="text-align: center; color: #e53e3e; padding: 2rem;">
         <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
-        <p>Planlar yüklenirken hata oluştu.</p>
+        <p style="font-size: 0.95rem; margin-bottom: 0.5rem;">Planlar yüklenirken hata</p>
+        <button onclick="loadSavedPlans()" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
+          <i class="fas fa-redo" style="margin-right: 0.5rem;"></i>Tekrar Dene
+        </button>
       </div>
     `;
   }
+}
+
+// Tüm planları göster
+function showAllPlans() {
+  const savedPlansList = document.getElementById("saved-plans-list");
+  savedPlansList.innerHTML = "";
+
+  // Planları tarihe göre sırala (en yeni üstte)
+  const sortedPlans = [...savedPlans].sort(
+    (a, b) => new Date(b.plan_date) - new Date(a.plan_date)
+  );
+
+  sortedPlans.forEach((plan, index) => {
+    const planItem = createSavedPlanItem(plan);
+    // Animasyon için delay ekle
+    planItem.style.opacity = '0';
+    planItem.style.transform = 'translateY(10px)';
+    savedPlansList.appendChild(planItem);
+    
+    setTimeout(() => {
+      planItem.style.transition = 'all 0.3s ease';
+      planItem.style.opacity = '1';
+      planItem.style.transform = 'translateY(0)';
+    }, index * 30);
+  });
+
+  // "Daha az göster" linki ekle
+  const lessDiv = document.createElement("div");
+  lessDiv.style.textAlign = "center";
+  lessDiv.style.padding = "1rem";
+  lessDiv.innerHTML = `
+    <span style="color: #667eea; font-size: 0.9rem; cursor: pointer;" onclick="loadSavedPlans()">
+      <i class="fas fa-chevron-up" style="margin-right: 0.5rem;"></i>
+      Daha az göster
+    </span>
+  `;
+  savedPlansList.appendChild(lessDiv);
 }
 
 // Kayıtlı plan item'ı oluştur
@@ -595,14 +671,20 @@ function createSavedPlanItem(plan) {
   // Plan içeriğinden başlık çıkarmaya çalış
   const planTitle = extractPlanTitle(plan.content) || `Plan - ${date}`;
 
+  // Başlığı kısalt (çok uzunsa)
+  const truncatedTitle = planTitle.length > 50 ? planTitle.substring(0, 50) + "..." : planTitle;
+
   div.innerHTML = `
     <div class="plan-item-header">
-      <span class="plan-title">${planTitle}</span>
+      <span class="plan-title" title="${planTitle}">${truncatedTitle}</span>
       <span class="plan-date">${new Date(plan.plan_date).toLocaleDateString(
         "tr-TR"
       )}</span>
     </div>
-    <div class="plan-time">Oluşturulma: ${createdDate}</div>
+    <div class="plan-time">
+      <i class="fas fa-clock" style="margin-right: 4px; opacity: 0.7;"></i>
+      ${createdDate}
+    </div>
   `;
 
   return div;
@@ -653,5 +735,8 @@ function displayExistingPlan(plan) {
 
   // Plan başlığını çıkar ve mesajda göster
   const planTitle = extractPlanTitle(plan.content) || "Plan";
-  addMessageToChat(`📋 "${planTitle}" planı düzenleme için yüklendi. İstediğiniz değişiklikleri belirtebilirsiniz.`, "bot");
+  addMessageToChat(
+    `📋 "${planTitle}" planı düzenleme için yüklendi. İstediğiniz değişiklikleri belirtebilirsiniz.`,
+    "bot"
+  );
 }

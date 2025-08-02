@@ -733,7 +733,7 @@ body::before {
   .sidebar-section {
     width: 300px;
   }
-  
+
   .cards-section .container-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -745,24 +745,24 @@ body::before {
     flex-direction: column;
     gap: 1.5rem;
   }
-  
+
   .sidebar-section {
     width: 100%;
     max-width: none;
     flex-direction: row;
     gap: 1.5rem;
   }
-  
+
   .calendar-card,
   .daily-plan-panel {
     flex: 1;
     min-width: 0;
   }
-  
+
   .daily-plan-panel {
     max-height: 350px;
   }
-  
+
   .cards-section .container-grid {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
@@ -774,14 +774,14 @@ body::before {
   .sidebar-section {
     flex-direction: column;
   }
-  
+
   .cards-section .container-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 1rem;
     min-height: 500px;
   }
-  
+
   .daily-plan-panel {
     max-height: 300px;
   }
@@ -793,11 +793,11 @@ body::before {
     grid-template-rows: repeat(6, 1fr);
     min-height: 600px;
   }
-  
+
   .dashboard-layout {
     gap: 1rem;
   }
-  
+
   .sidebar-section {
     gap: 1rem;
   }

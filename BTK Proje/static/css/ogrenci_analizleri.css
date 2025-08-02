@@ -283,14 +283,14 @@ body {
   flex: 1;
   display: none;
   padding: 1.5rem;
-  overflow: hidden; /* Ana container overflow'unu kontrol et */
   min-height: 0; /* Flex shrinking için gerekli */
+  height: 100%; /* Tam yükseklik kullan */
+  overflow-y: auto; /* Dikey scroll için */
 }
 
 .tab-content.active {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Tam yükseklik kullan */
 }
 
 /* Chat Tab */
@@ -521,16 +521,24 @@ body {
 }
 
 /* Progress Tab */
+.progress-container {
+  height: 100%;
+  overflow-y: auto;
+}
+
 .progress-container h4 {
   color: #2d3748;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .progress-cards {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  padding-bottom: 2rem;
 }
 
 .progress-card {
@@ -542,16 +550,18 @@ body {
   align-items: center;
   gap: 1rem;
   transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
 }
 
 .progress-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
 }
 
 .progress-icon {
-  font-size: 2rem;
-  width: 60px;
+  font-size: 2.5rem;
+  width: 70px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -563,23 +573,56 @@ body {
 .progress-info h5 {
   color: #2d3748;
   margin-bottom: 0.75rem;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .progress-bar {
   background: #e2e8f0;
   border-radius: 10px;
-  height: 8px;
+  height: 10px;
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  position: relative;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
   border-radius: 10px;
   transition: width 0.8s ease;
+  position: relative;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.progress-score {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+/* Progress Analysis Section */
+.progress-analysis {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.progress-analysis h4 {
+  color: #2d3748;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.analysis-content {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: #4a5568;
+  font-size: 0.95rem;
 }
 
 .progress-info {

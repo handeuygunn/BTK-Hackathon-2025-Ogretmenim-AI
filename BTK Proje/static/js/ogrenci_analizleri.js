@@ -212,9 +212,10 @@ async function loadStudentProgress() {
 
   // Loading göster
   progressContainer.innerHTML = `
-    <div style="text-align: center; padding: 2rem;">
-      <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #667eea;"></i>
-      <p style="margin-top: 1rem; color: #718096;">Gemini AI ile gelişim analizi yapılıyor...</p>
+    <div style="text-align: center; padding: 3rem; color: #718096; grid-column: 1 / -1;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+      <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Gemini AI Gelişim Analizi</p>
+      <p style="font-size: 0.9rem;">${selectedStudent.name} için detaylı analiz yapılıyor...</p>
     </div>
   `;
 
@@ -244,11 +245,12 @@ async function loadStudentProgress() {
   } catch (error) {
     console.error("DEBUG: Progress API hatası:", error);
     progressContainer.innerHTML = `
-      <div style="text-align: center; padding: 2rem; color: #e53e3e;">
-        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-        <p>Gelişim analizi yüklenirken hata oluştu.</p>
-        <button onclick="loadStudentProgress()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
-          Tekrar Dene
+      <div style="text-align: center; padding: 3rem; color: #e53e3e; grid-column: 1 / -1;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Analiz Hatası</p>
+        <p style="font-size: 0.9rem; margin-bottom: 1rem;">Gelişim analizi yüklenirken hata oluştu</p>
+        <button onclick="loadStudentProgress()" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+          <i class="fas fa-redo"></i> Tekrar Dene
         </button>
       </div>
     `;
@@ -301,11 +303,11 @@ function displayStudentProgress(data) {
         <div class="progress-info">
           <h5>${card.title}</h5>
           <div class="progress-bar">
-            <div class="progress-fill" style="width: ${score}%; background-color: ${color};"></div>
+            <div class="progress-fill" style="width: ${score}%; background: linear-gradient(135deg, ${color}, ${color}AA);"></div>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+          <div class="progress-score">
             <span style="color: ${color}; font-weight: 600;">${level}</span>
-            <span style="color: #4a5568; font-weight: 600;">${score}/100</span>
+            <span style="float: right; color: #4a5568; font-weight: 600;">${score}/100</span>
           </div>
         </div>
       </div>
@@ -314,20 +316,25 @@ function displayStudentProgress(data) {
 
   // Gemini analizini ekle
   progressHTML += `
-    <div style="grid-column: 1 / -1; margin-top: 1rem;">
-      <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);">
-        <h4 style="color: #2d3748; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-          <i class="fas fa-robot" style="color: #667eea;"></i>
-          Gemini AI Gelişim Analizi
-        </h4>
-        <div style="white-space: pre-wrap; line-height: 1.6; color: #4a5568;">
-          ${data.analysis}
-        </div>
-      </div>
+    <div class="progress-analysis" style="grid-column: 1 / -1;">
+      <h4>
+        <i class="fas fa-robot" style="color: #667eea; margin-right: 0.5rem;"></i>
+        Gemini AI Gelişim Analizi
+      </h4>
+      <div class="analysis-content">${data.analysis}</div>
     </div>
   `;
 
   progressContainer.innerHTML = progressHTML;
+
+  // Progress bar animasyonları için delay ekle
+  setTimeout(() => {
+    document.querySelectorAll('.progress-fill').forEach((fill, index) => {
+      setTimeout(() => {
+        fill.style.transform = 'scaleX(1)';
+      }, index * 200);
+    });
+  }, 100);
 }
 
 // Mesaj gönder

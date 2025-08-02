@@ -27,7 +27,8 @@
           <i class="fas fa-sign-out-alt"></i>
         </a>
       </div>
-    </header>    <main class="main-content">
+    </header>
+    <main class="main-content">
       <div class="dashboard-layout">
         <!-- Sol Panel - Cards -->
         <div class="cards-section">
@@ -54,7 +55,10 @@
                 Yaratıcı çalışma sayfaları hazırlayın
               </div>
             </div>
-            <div class="card" onclick="window.location.href='/ogrenci-analizleri'">
+            <div
+              class="card"
+              onclick="window.location.href='/ogrenci-analizleri'"
+            >
               <div class="card-icon">📊</div>
               <div class="card-title">Öğrenci Analizleri</div>
               <div class="card-description">Öğrenci gelişimini takip edin</div>
@@ -101,7 +105,11 @@
           <div class="daily-plan-panel">
             <div class="plan-panel-header">
               <h3 id="selected-date-title">📅 Bugün</h3>
-              <button class="refresh-btn" onclick="refreshTodayPlan()" title="Yenile">
+              <button
+                class="refresh-btn"
+                onclick="refreshTodayPlan()"
+                title="Yenile"
+              >
                 <i class="fas fa-sync-alt"></i>
               </button>
             </div>
@@ -109,11 +117,15 @@
               <div class="no-plan-message">
                 <div class="no-plan-icon">📋</div>
                 <p>Bu tarih için plan bulunamadı</p>
-                <button class="create-plan-btn" onclick="window.location.href='/gunluk-plan'">
+                <button
+                  class="create-plan-btn"
+                  onclick="window.location.href='/gunluk-plan'"
+                >
                   <i class="fas fa-plus"></i> Plan Oluştur
                 </button>
               </div>
-            </div>          </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>

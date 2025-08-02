@@ -87,6 +87,8 @@ body {
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 100px);
+  overflow: hidden;
 }
 
 .panel-header {
@@ -591,14 +593,18 @@ body {
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  max-height: 300px;
+  flex: 1;
+  min-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
+  margin-top: 1rem;
 }
 
 .section-header h4 {
   color: #2d3748;
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .saved-plans-list {
@@ -608,41 +614,65 @@ body {
 }
 
 .saved-plan-item {
-  background: #f7fafc;
-  border-radius: 8px;
-  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  border-left: 4px solid #667eea;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.saved-plan-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
 .saved-plan-item:hover {
-  background: #edf2f7;
-  transform: translateX(2px);
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
 }
 
 .plan-item-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.25rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  gap: 1rem;
 }
 
 .plan-title {
   font-weight: 600;
   color: #2d3748;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  flex: 1;
+  word-break: break-word;
 }
 
 .plan-date {
-  color: #718096;
-  font-size: 0.8rem;
+  color: #667eea;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
 .plan-time {
-  color: #667eea;
+  color: #718096;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 400;
+  margin-top: 0.25rem;
 }
 
 /* Modal */

@@ -25,13 +25,15 @@ const months = [
 async function initializeCalendar() {
   await loadDailyPlans(); // Günlük planları yükle
   generateCalendar(currentMonth, currentYear);
-  
+
   // Bugünün planını göster
   const today = new Date();
-  const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  const todayPlan = dailyPlans.find(plan => plan.plan_date === todayString);
+  const todayString = `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const todayPlan = dailyPlans.find((plan) => plan.plan_date === todayString);
   updatePlanPanel(today, todayPlan);
-  
+
   // Bugünü seç
   setTimeout(() => {
     const todayElement = document.querySelector(".calendar-day.today");
@@ -155,7 +157,8 @@ function selectDate(day, month, year, event, planForDate = null) {
   updatePlanPanel(selectedDate, planForDate);
 
   // Eğer bu tarih için plan varsa ve modal açma isteniyorsa
-  if (planForDate && event.detail === 2) { // Double click için modal aç
+  if (planForDate && event.detail === 2) {
+    // Double click için modal aç
     showPlanModal(planForDate);
   }
 }
@@ -362,7 +365,9 @@ function updatePlanPanel(date, planForDate = null) {
         ${formatPlanContent(planForDate.content)}
       </div>
       <div class="plan-actions">
-        <button class="plan-action-btn" onclick="showPlanModal(${JSON.stringify(planForDate).replace(/"/g, '&quot;')})">
+        <button class="plan-action-btn" onclick="showPlanModal(${JSON.stringify(
+          planForDate
+        ).replace(/"/g, "&quot;")})">
           <i class="fas fa-expand"></i> Detaylar
         </button>
         <button class="plan-action-btn" onclick="editPlanFromPanel()">
@@ -387,27 +392,32 @@ function updatePlanPanel(date, planForDate = null) {
 function editPlanFromPanel() {
   if (selectedDate) {
     // Seçili tarihi localStorage'a kaydet ve günlük plan sayfasına git
-    localStorage.setItem('editPlanDate', selectedDate.toISOString().split('T')[0]);
-    window.location.href = '/gunluk-plan';
+    localStorage.setItem(
+      "editPlanDate",
+      selectedDate.toISOString().split("T")[0]
+    );
+    window.location.href = "/gunluk-plan";
   }
 }
 
 // Bugünün planını yenile
 function refreshTodayPlan() {
   const today = new Date();
-  const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  
+  const todayString = `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
   // Bugünün planını bul
-  const todayPlan = dailyPlans.find(plan => plan.plan_date === todayString);
-  
+  const todayPlan = dailyPlans.find((plan) => plan.plan_date === todayString);
+
   // Panel'i güncelle
   updatePlanPanel(today, todayPlan);
-  
+
   // Takvimi de güncelle
   currentMonth = today.getMonth();
   currentYear = today.getFullYear();
   generateCalendar(currentMonth, currentYear);
-  
+
   // Bugünü seç
   setTimeout(() => {
     const todayElement = document.querySelector(".calendar-day.today");
