@@ -18,13 +18,13 @@ async function loadStudentsFromAPI() {
     const data = await response.json();
 
     if (data.success) {
-      students = data.students.map(student => ({
+      students = data.students.map((student) => ({
         id: student.id,
         name: `${student.name} ${student.surname}`,
         age: calculateAge(student.birth_date) || 5, // Eğer yaş yoksa varsayılan 5
         avatar: getRandomAvatar(),
         class: student.class_name || student.sinif,
-        notes: [] // Notlar ayrı API'den gelecek
+        notes: [], // Notlar ayrı API'den gelecek
       }));
       loadStudents();
     } else {
@@ -146,7 +146,7 @@ async function loadNotesFromAPI(studentId) {
     console.error("API hatası:", error);
     currentNotes = [];
   }
-  
+
   // Notları göster
   loadNotes();
 }
@@ -395,8 +395,14 @@ async function saveNote() {
     return;
   }
 
+  // Loading göster
+  const saveButton = document.querySelector("#note-modal .btn-primary");
+  const originalText = saveButton.textContent;
+  saveButton.textContent = "Kaydediliyor...";
+  saveButton.disabled = true;
+
   try {
-    // API'ye notu gönder
+    // API'ye gözlemi gönder - Gemini formatlaması ile
     const response = await fetch("/api/student-notes", {
       method: "POST",
       headers: {
@@ -405,28 +411,101 @@ async function saveNote() {
       body: JSON.stringify({
         student_id: selectedStudent.id,
         content: noteText,
-        category: noteCategory
+        category: noteCategory,
       }),
     });
 
     const data = await response.json();
 
     if (data.success) {
-      // Başarılı kayıt sonrası notları yeniden yükle
-      await loadNotesFromAPI(selectedStudent.id);
-      
+      // Gemini'nin formatladığı gözlemi göster
+      if (data.formatted_content) {
+        showFormattedObservation(
+          data.original_content,
+          data.formatted_content,
+          data.original_category,
+          data.gemini_response
+        );
+      }
+
+      // Notları yeniden yükle (veritabanı entegrasyonu sonrası)
+      // await loadNotesFromAPI(selectedStudent.id);
+
       // Modal'ı kapat
       closeNoteModal();
-      
+
       // Başarı mesajı göster
-      showSuccessMessage("Gözlem başarıyla kaydedildi!");
+      showSuccessMessage(
+        "Gözlem Gemini AI tool call ile formatlandı ve kaydedildi!"
+      );
     } else {
-      alert("Not kaydedilirken hata oluştu: " + data.error);
+      alert("Gözlem kaydedilirken hata oluştu: " + data.error);
     }
   } catch (error) {
     console.error("API hatası:", error);
     alert("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
+  } finally {
+    // Button'ı eski haline döndür
+    saveButton.textContent = originalText;
+    saveButton.disabled = false;
   }
+}
+
+// Formatlanmış gözlemi göster
+function showFormattedObservation(
+  original,
+  formatted,
+  category,
+  geminiResponse
+) {
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3>🤖 Gemini AI Tool Call Sonucu</h3>
+        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 1rem;">
+          <strong>Kategori:</strong> ${category}
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <strong>Orijinal Gözlem:</strong>
+          <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+            ${original}
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <strong>Gemini AI Formatlaması:</strong>
+          <div style="background: #e6fffa; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; border-left: 4px solid #38b2ac;">
+            ${formatted}
+          </div>
+        </div>
+        
+        ${
+          geminiResponse
+            ? `
+        <div>
+          <strong>Gemini AI Açıklaması:</strong>
+          <div style="background: #fef5e7; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; border-left: 4px solid #f6ad55;">
+            ${geminiResponse}
+          </div>
+        </div>
+        `
+            : ""
+        }
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Tamam</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  modal.classList.add("active");
 }
 
 // Başarı mesajı göster
@@ -446,9 +525,9 @@ function showSuccessMessage(message) {
     animation: slideIn 0.3s ease;
   `;
   toast.textContent = message;
-  
+
   document.body.appendChild(toast);
-  
+
   setTimeout(() => {
     toast.remove();
   }, 3000);
