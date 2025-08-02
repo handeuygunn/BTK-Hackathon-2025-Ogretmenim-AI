@@ -77,7 +77,7 @@ function createStudentItem(student) {
         <div class="student-avatar">${student.avatar}</div>
         <div class="student-details">
             <h4>${student.name}</h4>
-            <span>${student.class || 'Anaokulu'}</span>
+            <span>${student.class || "Anaokulu"}</span>
         </div>
     `;
 
@@ -103,11 +103,11 @@ function selectStudent(student) {
   // Öğrenci bilgilerini güncelle
   document.getElementById("selected-student-name").textContent = student.name;
 
-  // Chat'i sıfırla
-  resetChat();
-
-  // Notları API'den yükle
-  loadNotesFromAPI(student.id);
+  // Önce notları yükle, sonra chat'i başlat
+  loadNotesFromAPI(student.id).then(() => {
+    // Notlar yüklendikten sonra chat'i sıfırla ki doğru bilgiyi göstersin
+    resetChat();
+  });
 
   // Chat tab'ını aktif yap
   switchTab("chat");
@@ -121,6 +121,7 @@ async function loadNotesFromAPI(studentId) {
 
     if (data.success) {
       currentNotes = data.notes;
+      console.log(`DEBUG: ${currentNotes.length} gözlem yüklendi`);
     } else {
       console.error("Notları yüklerken hata:", data.error);
       currentNotes = [];
@@ -137,13 +138,25 @@ async function loadNotesFromAPI(studentId) {
 // Chat'i sıfırla
 function resetChat() {
   const chatMessages = document.getElementById("chat-messages");
+  
+  // Gözlem sayısını kontrol et
+  const observationCount = currentNotes.length;
+  const observationInfo = observationCount > 0 
+    ? `Bu öğrenci hakkında ${observationCount} gözlemim var ve sorularınızı cevaplanırken bunları dikkate alacağım.` 
+    : "Bu öğrenci hakkında henüz gözlemim bulunmuyor, genel deneyimlerimle yardımcı olacağım.";
+
   chatMessages.innerHTML = `
         <div class="chat-message bot-message">
             <div class="message-avatar">
                 <i class="fas fa-robot"></i>
             </div>
             <div class="message-content">
-                <p>Merhaba! ${selectedStudent.name} hakkında ne öğrenmek istiyorsunuz?</p>
+                <div>
+                  <p><strong>Merhaba!</strong> ${selectedStudent.name} hakkında ne öğrenmek istiyorsunuz?</p>
+                  <p style="font-size: 0.9rem; color: #718096; margin-top: 0.5rem;">
+                    📝 ${observationInfo}
+                  </p>
+                </div>
             </div>
         </div>
     `;
@@ -299,7 +312,7 @@ function displayStudentProgress(data) {
 
   // Gemini analizini ekle
   const formattedAnalysis = formatMarkdownToHTML(data.analysis);
-  
+
   progressHTML += `
     <div class="progress-analysis" style="grid-column: 1 / -1;">
       <h4>
@@ -314,9 +327,9 @@ function displayStudentProgress(data) {
 
   // Progress bar animasyonları için delay ekle
   setTimeout(() => {
-    document.querySelectorAll('.progress-fill').forEach((fill, index) => {
+    document.querySelectorAll(".progress-fill").forEach((fill, index) => {
       setTimeout(() => {
-        fill.style.transform = 'scaleX(1)';
+        fill.style.transform = "scaleX(1)";
       }, index * 200);
     });
   }, 100);
@@ -337,7 +350,16 @@ async function sendMessage() {
   const loadingDiv = addLoadingMessage();
 
   try {
-    // API'ye mesaj gönder
+    // Öğrencinin mevcut gözlemlerini al
+    const studentObservations = currentNotes.map(note => ({
+      content: note.content,
+      category: note.categoryLabel,
+      date: note.date
+    }));
+
+    console.log(`DEBUG: ${selectedStudent.name} için ${studentObservations.length} gözlem gönderiliyor:`, studentObservations);
+
+    // API'ye mesaj gönder (gözlemlerle birlikte)
     const response = await fetch("/api/analiz", {
       method: "POST",
       headers: {
@@ -347,17 +369,25 @@ async function sendMessage() {
         message: message,
         student_id: selectedStudent.id,
         student_name: selectedStudent.name,
+        student_observations: studentObservations
       }),
     });
 
     const data = await response.json();
+    console.log("DEBUG: API Response:", data);
 
     // Loading'i kaldır
     loadingDiv.remove();
 
     if (data.success) {
+      // Gözlem sayısını göster (eğer varsa)
+      let botMessage = data.response;
+      if (data.observations_count > 0) {
+        console.log(`DEBUG: ${data.observations_count} gözlem kullanıldı`);
+      }
+      
       // Bot cevabını ekle
-      addMessageToChat(data.response, "bot");
+      addMessageToChat(botMessage, "bot");
     } else {
       addMessageToChat(
         "Üzgünüm, bir hata oluştu. Lütfen tekrar deneyin.",
@@ -383,7 +413,8 @@ function addMessageToChat(message, sender) {
       : '<i class="fas fa-robot"></i>';
 
   // Bot mesajlarında Markdown formatını HTML'e çevir
-  const formattedMessage = sender === "bot" ? formatMarkdownToHTML(message) : message;
+  const formattedMessage =
+    sender === "bot" ? formatMarkdownToHTML(message) : message;
 
   messageDiv.innerHTML = `
         <div class="message-avatar">${avatar}</div>
@@ -583,8 +614,13 @@ async function saveNote() {
         );
       }
 
-      // Notları yeniden yükle (veritabanı entegrasyonu sonrası)
-      // await loadNotesFromAPI(selectedStudent.id);
+      // Notları yeniden yükle ve chat'i güncelle
+      await loadNotesFromAPI(selectedStudent.id);
+      
+      // Chat'i güncelle (gözlem sayısı değiştiği için)
+      if (document.querySelector('.tab-btn.active')?.textContent.includes('Analiz Sohbeti')) {
+        updateChatWithNewObservationCount();
+      }
 
       // Modal'ı kapat
       closeNoteModal();
@@ -606,86 +642,31 @@ async function saveNote() {
   }
 }
 
-// Formatlanmış gözlemi göster
-function showFormattedObservation(
-  original,
-  formatted,
-  category,
-  geminiResponse
-) {
-  const modal = document.createElement("div");
-  modal.className = "modal-overlay";
-  modal.innerHTML = `
-    <div class="modal-content" style="max-width: 700px;">
-      <div class="modal-header">
-        <h3>🤖 Gemini AI Tool Call Sonucu</h3>
-        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
+// Chat'i yeni gözlem sayısıyla güncelle
+function updateChatWithNewObservationCount() {
+  const chatMessages = document.getElementById("chat-messages");
+  const firstBotMessage = chatMessages.querySelector('.bot-message');
+  
+  if (firstBotMessage && selectedStudent) {
+    const observationCount = currentNotes.length;
+    const observationInfo = observationCount > 0 
+      ? `Bu öğrenci hakkında ${observationCount} gözlemim var ve sorularınızı cevaplanırken bunları dikkate alacağım.` 
+      : "Bu öğrenci hakkında henüz gözlemim bulunmuyor, genel deneyimlerimle yardımcı olacağım.";
+
+    firstBotMessage.innerHTML = `
+      <div class="message-avatar">
+        <i class="fas fa-robot"></i>
       </div>
-      <div class="modal-body">
-        <div style="margin-bottom: 1rem;">
-          <strong>Kategori:</strong> ${category}
-        </div>
-        
-        <div style="margin-bottom: 1rem;">
-          <strong>Orijinal Gözlem:</strong>
-          <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
-            ${original}
-          </div>
-        </div>
-        
-        <div style="margin-bottom: 1rem;">
-          <strong>Gemini AI Formatlaması:</strong>
-          <div style="background: #e6fffa; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; border-left: 4px solid #38b2ac;">
-            ${formatted}
-          </div>
-        </div>
-        
-        ${
-          geminiResponse
-            ? `
+      <div class="message-content">
         <div>
-          <strong>Gemini AI Açıklaması:</strong>
-          <div style="background: #fef5e7; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; border-left: 4px solid #f6ad55;">
-            ${geminiResponse}
-          </div>
+          <p><strong>Merhaba!</strong> ${selectedStudent.name} hakkında ne öğrenmek istiyorsunuz?</p>
+          <p style="font-size: 0.9rem; color: #718096; margin-top: 0.5rem;">
+            📝 ${observationInfo}
+          </p>
         </div>
-        `
-            : ""
-        }
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">Tamam</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-  modal.classList.add("active");
-}
-
-// Başarı mesajı göster
-function showSuccessMessage(message) {
-  // Basit bir toast notification göster
-  const toast = document.createElement("div");
-  toast.style.cssText = `
-    position: fixed;
-    top: 100px;
-    right: 20px;
-    background: #48bb78;
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1000;
-    animation: slideIn 0.3s ease;
-  `;
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
+    `;
+  }
 }
 
 // Modal dışına tıklandığında kapat
@@ -698,34 +679,41 @@ document.addEventListener("click", function (e) {
 
 // Markdown formatını HTML'e çevir
 function formatMarkdownToHTML(text) {
-  if (!text) return '';
-  
+  if (!text) return "";
+
   // Markdown'ı HTML'e çevir
   let formatted = text
     // Bold text (**text** → <strong>text</strong>)
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     // Italic text (*text* → <em>text</em>)
-    .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>')
+    .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em>$1</em>")
     // Headers (### text → <h3>text</h3>)
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+    .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+    .replace(/^# (.*$)/gim, "<h1>$1</h1>")
     // Lists (- item → <li>item</li>)
-    .replace(/^[\s]*[-•]\s+(.*$)/gim, '<li>$1</li>')
+    .replace(/^[\s]*[-•]\s+(.*$)/gim, "<li>$1</li>")
     // Numbered lists (1. item → <li>item</li>)
-    .replace(/^[\s]*\d+\.\s+(.*$)/gim, '<li>$1</li>')
+    .replace(/^[\s]*\d+\.\s+(.*$)/gim, "<li>$1</li>")
     // Line breaks (double newline → paragraph break)
-    .replace(/\n\s*\n/g, '</p><p>')
+    .replace(/\n\s*\n/g, "</p><p>")
     // Single line breaks
-    .replace(/\n/g, '<br>');
-  
+    .replace(/\n/g, "<br>");
+
   // Wrap consecutive <li> elements in <ul>
-  formatted = formatted.replace(/(<li>.*?<\/li>(?:\s*<li>.*?<\/li>)*)/gs, '<ul>$1</ul>');
-  
+  formatted = formatted.replace(
+    /(<li>.*?<\/li>(?:\s*<li>.*?<\/li>)*)/gs,
+    "<ul>$1</ul>"
+  );
+
   // Wrap in paragraph if not already wrapped
-  if (!formatted.startsWith('<h') && !formatted.startsWith('<ul') && !formatted.startsWith('<p>')) {
-    formatted = '<p>' + formatted + '</p>';
+  if (
+    !formatted.startsWith("<h") &&
+    !formatted.startsWith("<ul") &&
+    !formatted.startsWith("<p>")
+  ) {
+    formatted = "<p>" + formatted + "</p>";
   }
-  
+
   return formatted;
 }

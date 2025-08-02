@@ -537,7 +537,7 @@ function nextMonth() {
 async function loadSavedPlans() {
   try {
     const savedPlansList = document.getElementById("saved-plans-list");
-    
+
     // Loading göster
     savedPlansList.innerHTML = `
       <div style="text-align: center; color: #718096; padding: 2rem;">
@@ -582,14 +582,14 @@ async function loadSavedPlans() {
     sortedPlans.slice(0, 8).forEach((plan, index) => {
       const planItem = createSavedPlanItem(plan);
       // Animasyon için delay ekle
-      planItem.style.opacity = '0';
-      planItem.style.transform = 'translateY(10px)';
+      planItem.style.opacity = "0";
+      planItem.style.transform = "translateY(10px)";
       savedPlansList.appendChild(planItem);
-      
+
       setTimeout(() => {
-        planItem.style.transition = 'all 0.3s ease';
-        planItem.style.opacity = '1';
-        planItem.style.transform = 'translateY(0)';
+        planItem.style.transition = "all 0.3s ease";
+        planItem.style.opacity = "1";
+        planItem.style.transform = "translateY(0)";
       }, index * 50);
     });
 
@@ -606,7 +606,6 @@ async function loadSavedPlans() {
       `;
       savedPlansList.appendChild(moreDiv);
     }
-
   } catch (error) {
     console.error("Load saved plans error:", error);
     const savedPlansList = document.getElementById("saved-plans-list");
@@ -635,14 +634,14 @@ function showAllPlans() {
   sortedPlans.forEach((plan, index) => {
     const planItem = createSavedPlanItem(plan);
     // Animasyon için delay ekle
-    planItem.style.opacity = '0';
-    planItem.style.transform = 'translateY(10px)';
+    planItem.style.opacity = "0";
+    planItem.style.transform = "translateY(10px)";
     savedPlansList.appendChild(planItem);
-    
+
     setTimeout(() => {
-      planItem.style.transition = 'all 0.3s ease';
-      planItem.style.opacity = '1';
-      planItem.style.transform = 'translateY(0)';
+      planItem.style.transition = "all 0.3s ease";
+      planItem.style.opacity = "1";
+      planItem.style.transform = "translateY(0)";
     }, index * 30);
   });
 
@@ -672,7 +671,8 @@ function createSavedPlanItem(plan) {
   const planTitle = extractPlanTitle(plan.content) || `Plan - ${date}`;
 
   // Başlığı kısalt (çok uzunsa)
-  const truncatedTitle = planTitle.length > 50 ? planTitle.substring(0, 50) + "..." : planTitle;
+  const truncatedTitle =
+    planTitle.length > 50 ? planTitle.substring(0, 50) + "..." : planTitle;
 
   div.innerHTML = `
     <div class="plan-item-header">
