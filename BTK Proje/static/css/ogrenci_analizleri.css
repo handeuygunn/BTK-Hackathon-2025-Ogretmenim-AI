@@ -219,6 +219,8 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Container overflow'unu kontrol et */
+  min-height: 0; /* Flex shrinking için gerekli */
 }
 
 .student-header {
@@ -281,12 +283,14 @@ body {
   flex: 1;
   display: none;
   padding: 1.5rem;
-  overflow-y: auto;
+  overflow: hidden; /* Ana container overflow'unu kontrol et */
+  min-height: 0; /* Flex shrinking için gerekli */
 }
 
 .tab-content.active {
   display: flex;
   flex-direction: column;
+  height: 100%; /* Tam yükseklik kullan */
 }
 
 /* Chat Tab */
@@ -400,6 +404,7 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Ana container'ın overflow'unu kontrol et */
 }
 
 .notes-header {
@@ -407,6 +412,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-shrink: 0; /* Header'ın küçülmesini engelle */
 }
 
 .notes-header h4 {
@@ -424,6 +430,7 @@ body {
   font-weight: 500;
   transition: all 0.3s ease;
   margin-left: auto;
+  flex-shrink: 0; /* Button'ın küçülmesini engelle */
 }
 
 .add-note-btn:hover {
@@ -434,6 +441,27 @@ body {
 .notes-list {
   flex: 1;
   overflow-y: auto;
+  padding-right: 0.5rem; /* Scrollbar için alan bırak */
+  margin-right: -0.5rem; /* Görsel olarak padding'i gizle */
+}
+
+/* Scrollbar stilleri */
+.notes-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notes-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.notes-list::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 3px;
+}
+
+.notes-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.5);
 }
 
 .note-item {
@@ -443,13 +471,27 @@ body {
   margin-bottom: 1rem;
   border-left: 4px solid #667eea;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  word-wrap: break-word; /* Uzun kelimeleri kes */
+  overflow-wrap: break-word; /* Modern tarayıcılar için */
+}
+
+.note-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.note-item:last-child {
+  margin-bottom: 0; /* Son item'da margin kaldır */
 }
 
 .note-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Üstten hizala */
   margin-bottom: 0.75rem;
+  gap: 1rem; /* Elementler arası boşluk */
+  flex-wrap: wrap; /* Küçük ekranlarda wrap yap */
 }
 
 .note-category {
@@ -459,16 +501,23 @@ body {
   border-radius: 15px;
   font-size: 0.8rem;
   font-weight: 500;
+  white-space: nowrap; /* Kategori wrap olmasın */
+  flex-shrink: 0; /* Küçülmesin */
 }
 
 .note-date {
   color: #718096;
   font-size: 0.85rem;
+  white-space: nowrap; /* Tarih wrap olmasın */
+  flex-shrink: 0; /* Küçülmesin */
 }
 
 .note-content {
   color: #4a5568;
   line-height: 1.6;
+  max-width: 100%; /* İçerik container'ı aşmasın */
+  word-break: break-word; /* Uzun kelimeleri kes */
+  white-space: pre-wrap; /* Satır sonlarını koru */
 }
 
 /* Progress Tab */
@@ -690,11 +739,13 @@ body {
 @media (max-width: 768px) {
   .main-container {
     flex-direction: column;
+    height: calc(100vh - 80px);
   }
 
   .students-panel {
     width: 100%;
     height: 200px;
+    flex-shrink: 0;
   }
 
   .students-list {
@@ -707,5 +758,62 @@ body {
   .student-item {
     min-width: 200px;
     margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .analysis-panel {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .tab-content {
+    padding: 1rem;
+  }
+
+  .notes-list {
+    padding-right: 0.25rem;
+    margin-right: -0.25rem;
+  }
+
+  .note-item {
+    padding: 1rem;
+  }
+
+  .note-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .note-category,
+  .note-date {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .header h2 {
+    font-size: 1.2rem;
+  }
+
+  .students-panel {
+    height: 150px;
+  }
+
+  .student-item {
+    min-width: 150px;
+    padding: 0.75rem;
+  }
+
+  .tab-content {
+    padding: 0.75rem;
+  }
+
+  .note-item {
+    padding: 0.75rem;
   }
 }
