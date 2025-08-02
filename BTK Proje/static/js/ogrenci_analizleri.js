@@ -21,7 +21,6 @@ async function loadStudentsFromAPI() {
       students = data.students.map((student) => ({
         id: student.id,
         name: `${student.name} ${student.surname}`,
-        age: calculateAge(student.birth_date) || 5, // Eğer yaş yoksa varsayılan 5
         avatar: getRandomAvatar(),
         class: student.class_name || student.sinif,
         notes: [], // Notlar ayrı API'den gelecek
@@ -45,19 +44,6 @@ async function loadStudentsFromAPI() {
 function getRandomAvatar() {
   const avatars = ["👦", "👧"];
   return avatars[Math.floor(Math.random() * avatars.length)];
-}
-
-// Yaş hesapla (doğum tarihinden)
-function calculateAge(birthDate) {
-  if (!birthDate) return null;
-  const today = new Date();
-  const birth = new Date(birthDate);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
 }
 
 // Öğrencileri yükle
@@ -91,7 +77,7 @@ function createStudentItem(student) {
         <div class="student-avatar">${student.avatar}</div>
         <div class="student-details">
             <h4>${student.name}</h4>
-            <span>${student.age} yaş</span>
+            <span>${student.class || 'Anaokulu'}</span>
         </div>
     `;
 
@@ -116,9 +102,6 @@ function selectStudent(student) {
 
   // Öğrenci bilgilerini güncelle
   document.getElementById("selected-student-name").textContent = student.name;
-  document.getElementById(
-    "selected-student-age"
-  ).textContent = `${student.age} yaş`;
 
   // Chat'i sıfırla
   resetChat();
@@ -315,13 +298,15 @@ function displayStudentProgress(data) {
   });
 
   // Gemini analizini ekle
+  const formattedAnalysis = formatMarkdownToHTML(data.analysis);
+  
   progressHTML += `
     <div class="progress-analysis" style="grid-column: 1 / -1;">
       <h4>
         <i class="fas fa-robot" style="color: #667eea; margin-right: 0.5rem;"></i>
         Gemini AI Gelişim Analizi
       </h4>
-      <div class="analysis-content">${data.analysis}</div>
+      <div class="analysis-content">${formattedAnalysis}</div>
     </div>
   `;
 
@@ -397,10 +382,13 @@ function addMessageToChat(message, sender) {
       ? '<i class="fas fa-user"></i>'
       : '<i class="fas fa-robot"></i>';
 
+  // Bot mesajlarında Markdown formatını HTML'e çevir
+  const formattedMessage = sender === "bot" ? formatMarkdownToHTML(message) : message;
+
   messageDiv.innerHTML = `
         <div class="message-avatar">${avatar}</div>
         <div class="message-content">
-            <p>${message}</p>
+            <div>${formattedMessage}</div>
         </div>
     `;
 
@@ -707,3 +695,37 @@ document.addEventListener("click", function (e) {
     closeNoteModal();
   }
 });
+
+// Markdown formatını HTML'e çevir
+function formatMarkdownToHTML(text) {
+  if (!text) return '';
+  
+  // Markdown'ı HTML'e çevir
+  let formatted = text
+    // Bold text (**text** → <strong>text</strong>)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    // Italic text (*text* → <em>text</em>)
+    .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>')
+    // Headers (### text → <h3>text</h3>)
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    // Lists (- item → <li>item</li>)
+    .replace(/^[\s]*[-•]\s+(.*$)/gim, '<li>$1</li>')
+    // Numbered lists (1. item → <li>item</li>)
+    .replace(/^[\s]*\d+\.\s+(.*$)/gim, '<li>$1</li>')
+    // Line breaks (double newline → paragraph break)
+    .replace(/\n\s*\n/g, '</p><p>')
+    // Single line breaks
+    .replace(/\n/g, '<br>');
+  
+  // Wrap consecutive <li> elements in <ul>
+  formatted = formatted.replace(/(<li>.*?<\/li>(?:\s*<li>.*?<\/li>)*)/gs, '<ul>$1</ul>');
+  
+  // Wrap in paragraph if not already wrapped
+  if (!formatted.startsWith('<h') && !formatted.startsWith('<ul') && !formatted.startsWith('<p>')) {
+    formatted = '<p>' + formatted + '</p>';
+  }
+  
+  return formatted;
+}

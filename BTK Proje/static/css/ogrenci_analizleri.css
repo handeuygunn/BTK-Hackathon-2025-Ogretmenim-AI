@@ -342,17 +342,42 @@ body {
   max-width: 80%;
 }
 
-.bot-message .message-content {
-  background: linear-gradient(135deg, #667eea10, #764ba210);
+.message-content strong {
+  color: #2d3748;
+  font-weight: 600;
 }
 
-.user-message {
-  flex-direction: row-reverse;
+.message-content h1,
+.message-content h2,
+.message-content h3 {
+  color: #667eea;
+  margin: 0.75rem 0 0.5rem 0;
+  font-weight: 600;
 }
 
-.user-message .message-content {
-  background: #667eea;
-  color: white;
+.message-content h1 {
+  font-size: 1.1rem;
+}
+
+.message-content h2 {
+  font-size: 1.05rem;
+}
+
+.message-content h3 {
+  font-size: 1rem;
+}
+
+.message-content ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.message-content li {
+  margin-bottom: 0.25rem;
+}
+
+.message-content br {
+  margin-bottom: 0.5rem;
 }
 
 .chat-input-container {
@@ -619,10 +644,48 @@ body {
 }
 
 .analysis-content {
-  white-space: pre-wrap;
-  line-height: 1.6;
+  line-height: 1.7;
   color: #4a5568;
   font-size: 0.95rem;
+}
+
+.analysis-content strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.analysis-content h1,
+.analysis-content h2,
+.analysis-content h3 {
+  color: #667eea;
+  margin: 1rem 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.analysis-content h1 {
+  font-size: 1.3rem;
+}
+
+.analysis-content h2 {
+  font-size: 1.2rem;
+}
+
+.analysis-content h3 {
+  font-size: 1.1rem;
+}
+
+.analysis-content ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.analysis-content li {
+  margin-bottom: 0.25rem;
+  color: #4a5568;
+}
+
+.analysis-content br {
+  margin-bottom: 0.5rem;
 }
 
 .progress-info {
