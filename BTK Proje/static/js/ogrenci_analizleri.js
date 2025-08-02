@@ -138,12 +138,13 @@ async function loadNotesFromAPI(studentId) {
 // Chat'i sıfırla
 function resetChat() {
   const chatMessages = document.getElementById("chat-messages");
-  
+
   // Gözlem sayısını kontrol et
   const observationCount = currentNotes.length;
-  const observationInfo = observationCount > 0 
-    ? `Bu öğrenci hakkında ${observationCount} gözlemim var ve sorularınızı cevaplanırken bunları dikkate alacağım.` 
-    : "Bu öğrenci hakkında henüz gözlemim bulunmuyor, genel deneyimlerimle yardımcı olacağım.";
+  const observationInfo =
+    observationCount > 0
+      ? `Bu öğrenci hakkında ${observationCount} gözlemim var ve sorularınızı cevaplanırken bunları dikkate alacağım.`
+      : "Bu öğrenci hakkında henüz gözlemim bulunmuyor, genel deneyimlerimle yardımcı olacağım.";
 
   chatMessages.innerHTML = `
         <div class="chat-message bot-message">
@@ -351,13 +352,16 @@ async function sendMessage() {
 
   try {
     // Öğrencinin mevcut gözlemlerini al
-    const studentObservations = currentNotes.map(note => ({
+    const studentObservations = currentNotes.map((note) => ({
       content: note.content,
       category: note.categoryLabel,
-      date: note.date
+      date: note.date,
     }));
 
-    console.log(`DEBUG: ${selectedStudent.name} için ${studentObservations.length} gözlem gönderiliyor:`, studentObservations);
+    console.log(
+      `DEBUG: ${selectedStudent.name} için ${studentObservations.length} gözlem gönderiliyor:`,
+      studentObservations
+    );
 
     // API'ye mesaj gönder (gözlemlerle birlikte)
     const response = await fetch("/api/analiz", {
@@ -369,7 +373,7 @@ async function sendMessage() {
         message: message,
         student_id: selectedStudent.id,
         student_name: selectedStudent.name,
-        student_observations: studentObservations
+        student_observations: studentObservations,
       }),
     });
 
@@ -385,7 +389,7 @@ async function sendMessage() {
       if (data.observations_count > 0) {
         console.log(`DEBUG: ${data.observations_count} gözlem kullanıldı`);
       }
-      
+
       // Bot cevabını ekle
       addMessageToChat(botMessage, "bot");
     } else {
@@ -616,9 +620,13 @@ async function saveNote() {
 
       // Notları yeniden yükle ve chat'i güncelle
       await loadNotesFromAPI(selectedStudent.id);
-      
+
       // Chat'i güncelle (gözlem sayısı değiştiği için)
-      if (document.querySelector('.tab-btn.active')?.textContent.includes('Analiz Sohbeti')) {
+      if (
+        document
+          .querySelector(".tab-btn.active")
+          ?.textContent.includes("Analiz Sohbeti")
+      ) {
         updateChatWithNewObservationCount();
       }
 
@@ -645,13 +653,14 @@ async function saveNote() {
 // Chat'i yeni gözlem sayısıyla güncelle
 function updateChatWithNewObservationCount() {
   const chatMessages = document.getElementById("chat-messages");
-  const firstBotMessage = chatMessages.querySelector('.bot-message');
-  
+  const firstBotMessage = chatMessages.querySelector(".bot-message");
+
   if (firstBotMessage && selectedStudent) {
     const observationCount = currentNotes.length;
-    const observationInfo = observationCount > 0 
-      ? `Bu öğrenci hakkında ${observationCount} gözlemim var ve sorularınızı cevaplanırken bunları dikkate alacağım.` 
-      : "Bu öğrenci hakkında henüz gözlemim bulunmuyor, genel deneyimlerimle yardımcı olacağım.";
+    const observationInfo =
+      observationCount > 0
+        ? `Bu öğrenci hakkında ${observationCount} gözlemim var ve sorularınızı cevaplanırken bunları dikkate alacağım.`
+        : "Bu öğrenci hakkında henüz gözlemim bulunmuyor, genel deneyimlerimle yardımcı olacağım.";
 
     firstBotMessage.innerHTML = `
       <div class="message-avatar">

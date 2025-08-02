@@ -41,6 +41,12 @@ body {
   gap: 1rem;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .back-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
@@ -345,6 +351,27 @@ body {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+}
+
+.gallery-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.gallery-controls .clear-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.gallery-controls .clear-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .gallery-stats {
