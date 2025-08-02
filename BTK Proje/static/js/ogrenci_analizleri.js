@@ -382,8 +382,14 @@ function closeNoteModal() {
 
 // Notu kaydet
 async function saveNote() {
+  console.log("DEBUG: saveNote fonksiyonu çağrıldı");
+  
   const noteText = document.getElementById("note-text").value.trim();
   const noteCategory = document.getElementById("note-category").value;
+
+  console.log("DEBUG: noteText:", noteText);
+  console.log("DEBUG: noteCategory:", noteCategory);
+  console.log("DEBUG: selectedStudent:", selectedStudent);
 
   if (!noteText) {
     alert("Lütfen gözlem metnini girin.");
@@ -396,14 +402,23 @@ async function saveNote() {
   }
 
   // Loading göster
-  const saveButton = document.querySelector("#note-modal .btn-primary");
+  const saveButton = document.querySelector("#note-modal .save-btn");
+  if (!saveButton) {
+    console.error("DEBUG: Save button bulunamadı!");
+    return;
+  }
+  
   const originalText = saveButton.textContent;
   saveButton.textContent = "Kaydediliyor...";
   saveButton.disabled = true;
 
   try {
-    console.log("DEBUG: Gözlem kaydediliyor...", { student_id: selectedStudent.id, content: noteText, category: noteCategory });
-    
+    console.log("DEBUG: Gözlem kaydediliyor...", {
+      student_id: selectedStudent.id,
+      content: noteText,
+      category: noteCategory,
+    });
+
     // API'ye gözlemi gönder - Gemini formatlaması ile
     const response = await fetch("/api/student-notes", {
       method: "POST",
