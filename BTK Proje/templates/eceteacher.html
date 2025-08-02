@@ -27,67 +27,93 @@
           <i class="fas fa-sign-out-alt"></i>
         </a>
       </div>
-    </header>
+    </header>    <main class="main-content">
+      <div class="dashboard-layout">
+        <!-- Sol Panel - Cards -->
+        <div class="cards-section">
+          <div class="container-grid">
+            <div class="card" onclick="window.location.href='/gunluk-plan'">
+              <div class="card-icon">📅</div>
+              <div class="card-title">Günlük Plan</div>
+              <div class="card-description">
+                Günlük eğitim planlarınızı oluşturun
+              </div>
+            </div>
 
-    <main class="main-content">
-      <div class="container-grid">
-        <div class="card" onclick="window.location.href='/gunluk-plan'">
-          <div class="card-icon">📅</div>
-          <div class="card-title">Günlük Plan</div>
-          <div class="card-description">
-            Günlük eğitim planlarınızı oluşturun
+            <div class="card" onclick="openChatbot('Etkinlik/Oyun Planı')">
+              <div class="card-icon">🎮</div>
+              <div class="card-title">Etkinlik/Oyun Planı</div>
+              <div class="card-description">
+                Eğlenceli etkinlik ve oyunlar planlayın
+              </div>
+            </div>
+            <div class="card" onclick="window.location.href='/boyama-sayfasi'">
+              <div class="card-icon">🎨</div>
+              <div class="card-title">Boyama/Çalışma Sayfaları</div>
+              <div class="card-description">
+                Yaratıcı çalışma sayfaları hazırlayın
+              </div>
+            </div>
+            <div class="card" onclick="window.location.href='/ogrenci-analizleri'">
+              <div class="card-icon">📊</div>
+              <div class="card-title">Öğrenci Analizleri</div>
+              <div class="card-description">Öğrenci gelişimini takip edin</div>
+            </div>
+            <div class="card" onclick="openChatbot('Hikayeler')">
+              <div class="card-icon">📚</div>
+              <div class="card-title">Hikayeler</div>
+              <div class="card-description">Eğitici hikayeler oluşturun</div>
+            </div>
           </div>
         </div>
 
-        <div class="card" onclick="openChatbot('Etkinlik/Oyun Planı')">
-          <div class="card-icon">🎮</div>
-          <div class="card-title">Etkinlik/Oyun Planı</div>
-          <div class="card-description">
-            Eğlenceli etkinlik ve oyunlar planlayın
-          </div>
-        </div>
-        <div class="card" onclick="window.location.href='/boyama-sayfasi'">
-          <div class="card-icon">🎨</div>
-          <div class="card-title">Boyama/Çalışma Sayfaları</div>
-          <div class="card-description">
-            Yaratıcı çalışma sayfaları hazırlayın
-          </div>
-        </div>
-        <div class="card" onclick="window.location.href='/ogrenci-analizleri'">
-          <div class="card-icon">📊</div>
-          <div class="card-title">Öğrenci Analizleri</div>
-          <div class="card-description">Öğrenci gelişimini takip edin</div>
-        </div>
-        <div class="card" onclick="openChatbot('Hikayeler')">
-          <div class="card-icon">📚</div>
-          <div class="card-title">Hikayeler</div>
-          <div class="card-description">Eğitici hikayeler oluşturun</div>
-        </div>
-        <div class="card calendar-card">
-          <div class="calendar-header">
-            <button class="nav-btn" onclick="previousMonth()">‹</button>
-            <div class="calendar-title">
-              <span id="month-year"></span>
+        <!-- Sağ Panel - Takvim ve Günlük Plan -->
+        <div class="sidebar-section">
+          <!-- Takvim -->
+          <div class="calendar-card">
+            <div class="calendar-header">
+              <button class="nav-btn" onclick="previousMonth()">‹</button>
+              <div class="calendar-title">
+                <span id="month-year"></span>
+              </div>
+              <button class="nav-btn" onclick="nextMonth()">›</button>
             </div>
-            <button class="nav-btn" onclick="nextMonth()">›</button>
-          </div>
-          <div class="calendar-grid">
-            <div class="calendar-weekdays">
-              <div class="weekday">Paz</div>
-              <div class="weekday">Pzt</div>
-              <div class="weekday">Sal</div>
-              <div class="weekday">Çar</div>
-              <div class="weekday">Per</div>
-              <div class="weekday">Cum</div>
-              <div class="weekday">Cmt</div>
+            <div class="calendar-grid">
+              <div class="calendar-weekdays">
+                <div class="weekday">Paz</div>
+                <div class="weekday">Pzt</div>
+                <div class="weekday">Sal</div>
+                <div class="weekday">Çar</div>
+                <div class="weekday">Per</div>
+                <div class="weekday">Cum</div>
+                <div class="weekday">Cmt</div>
+              </div>
+              <div class="calendar-days" id="calendar-days">
+                <!-- Günler buraya dinamik olarak eklenecek -->
+              </div>
             </div>
-            <div class="calendar-days" id="calendar-days">
-              <!-- Günler buraya dinamik olarak eklenecek -->
+            <div class="calendar-footer">
+              <button class="today-btn" onclick="goToToday()">Bugün</button>
             </div>
           </div>
-          <div class="calendar-footer">
-            <button class="today-btn" onclick="goToToday()">Bugün</button>
-          </div>
+
+          <!-- Günlük Plan Görüntüleme -->
+          <div class="daily-plan-panel">
+            <div class="plan-panel-header">
+              <h3 id="selected-date-title">📅 Bugün</h3>
+              <button class="refresh-btn" onclick="refreshTodayPlan()" title="Yenile">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div class="plan-panel-content" id="plan-panel-content">
+              <div class="no-plan-message">
+                <div class="no-plan-icon">📋</div>
+                <p>Bu tarih için plan bulunamadı</p>
+                <button class="create-plan-btn" onclick="window.location.href='/gunluk-plan'">
+                  <i class="fas fa-plus"></i> Plan Oluştur
+                </button>
+              </div>
+            </div>          </div>
         </div>
       </div>
     </main>

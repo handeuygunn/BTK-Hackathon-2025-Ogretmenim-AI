@@ -15,13 +15,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Sayfayı başlat
 async function initializePage() {
-  // Bugünün tarihini default olarak seç (takvim için)
-  const today = new Date().toISOString().split("T")[0];
-  // Kaydetme modal'ındaki tarihi bugün yap
-  document.getElementById("plan-date-save").value = today;
+  // Dashboard'dan gelen düzenleme tarihi kontrolü
+  const editPlanDate = localStorage.getItem('editPlanDate');
+  let selectedDate;
+  
+  if (editPlanDate) {
+    // Dashboard'dan gelen tarih varsa onu kullan
+    selectedDate = editPlanDate;
+    localStorage.removeItem('editPlanDate'); // Kullandıktan sonra temizle
+  } else {
+    // Yoksa bugünün tarihini kullan
+    selectedDate = new Date().toISOString().split("T")[0];
+  }
+  
+  // Kaydetme modal'ındaki tarihi seç
+  document.getElementById("plan-date-save").value = selectedDate;
 
   // Kayıtlı planları yükle
   await loadSavedPlans();
+
+  // Eğer seçili tarih için plan varsa yükle
+  if (editPlanDate) {
+    const existingPlan = savedPlans.find(plan => plan.plan_date === editPlanDate);
+    if (existingPlan) {
+      // Planı chat area'ya yükle
+      displayExistingPlan(existingPlan);
+    }
+  }
 
   // Takvimi yükle
   loadCalendar();
@@ -617,4 +637,21 @@ function loadSavedPlan(plan) {
   // Plan başlığını çıkar ve mesajda göster
   const planTitle = extractPlanTitle(plan.content) || "Plan";
   addMessageToChat(`📋 "${planTitle}" planı yüklendi.`, "bot");
+}
+
+// Mevcut planı chat area'ya yükle (dashboard'dan düzenleme için)
+function displayExistingPlan(plan) {
+  // Plan çıktısını göster
+  displayPlanOutput(plan.content, plan.plan_date);
+
+  // Current plan'ı güncelle
+  currentPlan = {
+    content: plan.content,
+    date: plan.plan_date,
+    timestamp: new Date(plan.created_at),
+  };
+
+  // Plan başlığını çıkar ve mesajda göster
+  const planTitle = extractPlanTitle(plan.content) || "Plan";
+  addMessageToChat(`📋 "${planTitle}" planı düzenleme için yüklendi. İstediğiniz değişiklikleri belirtebilirsiniz.`, "bot");
 }

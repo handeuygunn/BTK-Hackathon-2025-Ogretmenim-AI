@@ -25,6 +25,21 @@ const months = [
 async function initializeCalendar() {
   await loadDailyPlans(); // Günlük planları yükle
   generateCalendar(currentMonth, currentYear);
+  
+  // Bugünün planını göster
+  const today = new Date();
+  const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const todayPlan = dailyPlans.find(plan => plan.plan_date === todayString);
+  updatePlanPanel(today, todayPlan);
+  
+  // Bugünü seç
+  setTimeout(() => {
+    const todayElement = document.querySelector(".calendar-day.today");
+    if (todayElement) {
+      todayElement.classList.add("selected");
+      selectedDate = today;
+    }
+  }, 100);
 }
 
 // Takvim oluştur
@@ -136,8 +151,11 @@ function selectDate(day, month, year, event, planForDate = null) {
 
   console.log("Seçilen tarih:", selectedDate.toLocaleDateString("tr-TR"));
 
-  // Eğer bu tarih için plan varsa modal'ı aç
-  if (planForDate) {
+  // Sağ paneli güncelle
+  updatePlanPanel(selectedDate, planForDate);
+
+  // Eğer bu tarih için plan varsa ve modal açma isteniyorsa
+  if (planForDate && event.detail === 2) { // Double click için modal aç
     showPlanModal(planForDate);
   }
 }
@@ -318,3 +336,84 @@ document.addEventListener("keydown", function (event) {
     closePlanModal();
   }
 });
+
+// Sağ paneldeki plan görüntülemesini güncelle
+function updatePlanPanel(date, planForDate = null) {
+  const titleElement = document.getElementById("selected-date-title");
+  const contentElement = document.getElementById("plan-panel-content");
+
+  if (!titleElement || !contentElement) return;
+
+  // Tarih formatla
+  const formattedDate = date.toLocaleDateString("tr-TR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  // Başlığı güncelle
+  titleElement.innerHTML = `📅 ${formattedDate}`;
+
+  // İçeriği güncelle
+  if (planForDate) {
+    contentElement.innerHTML = `
+      <div class="plan-content">
+        ${formatPlanContent(planForDate.content)}
+      </div>
+      <div class="plan-actions">
+        <button class="plan-action-btn" onclick="showPlanModal(${JSON.stringify(planForDate).replace(/"/g, '&quot;')})">
+          <i class="fas fa-expand"></i> Detaylar
+        </button>
+        <button class="plan-action-btn" onclick="editPlanFromPanel()">
+          <i class="fas fa-edit"></i> Düzenle
+        </button>
+      </div>
+    `;
+  } else {
+    contentElement.innerHTML = `
+      <div class="no-plan-message">
+        <div class="no-plan-icon">📋</div>
+        <p>Bu tarih için plan bulunamadı</p>
+        <button class="create-plan-btn" onclick="window.location.href='/gunluk-plan'">
+          <i class="fas fa-plus"></i> Plan Oluştur
+        </button>
+      </div>
+    `;
+  }
+}
+
+// Panel'den plan düzenleme
+function editPlanFromPanel() {
+  if (selectedDate) {
+    // Seçili tarihi localStorage'a kaydet ve günlük plan sayfasına git
+    localStorage.setItem('editPlanDate', selectedDate.toISOString().split('T')[0]);
+    window.location.href = '/gunluk-plan';
+  }
+}
+
+// Bugünün planını yenile
+function refreshTodayPlan() {
+  const today = new Date();
+  const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  
+  // Bugünün planını bul
+  const todayPlan = dailyPlans.find(plan => plan.plan_date === todayString);
+  
+  // Panel'i güncelle
+  updatePlanPanel(today, todayPlan);
+  
+  // Takvimi de güncelle
+  currentMonth = today.getMonth();
+  currentYear = today.getFullYear();
+  generateCalendar(currentMonth, currentYear);
+  
+  // Bugünü seç
+  setTimeout(() => {
+    const todayElement = document.querySelector(".calendar-day.today");
+    if (todayElement) {
+      todayElement.classList.add("selected");
+      selectedDate = today;
+    }
+  }, 100);
+}
