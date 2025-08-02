@@ -76,6 +76,28 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+.logout-btn {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
+
+.logout-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+}
+
 .teacher-panel .icon {
   width: 36px;
   height: 36px;

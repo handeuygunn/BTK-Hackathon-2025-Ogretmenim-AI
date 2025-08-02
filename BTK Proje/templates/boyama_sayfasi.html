@@ -28,6 +28,12 @@
             </h1>
           </div>
           <div class="header-right">
+            <div class="teacher-info">
+              <span>{{ user.full_name if user else "Öğretmen" }}</span>
+              <a href="/logout" class="logout-btn" title="Çıkış Yap">
+                <i class="fas fa-sign-out-alt"></i>
+              </a>
+            </div>
             <button class="clear-btn" onclick="clearAll()">
               <i class="fas fa-trash"></i>
               Temizle

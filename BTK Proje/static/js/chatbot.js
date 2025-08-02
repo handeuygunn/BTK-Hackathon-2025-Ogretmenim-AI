@@ -305,7 +305,7 @@ function copyContent() {
 function exportContentToPDF() {
   const storyContent = document.getElementById("story-content");
   const titleElement = document.getElementById("content-display-title");
-  
+
   if (!storyContent || !storyContent.innerHTML.trim()) {
     alert("Dışa aktarılacak içerik bulunamadı.");
     return;
@@ -313,11 +313,11 @@ function exportContentToPDF() {
 
   const title = titleElement ? titleElement.textContent : "İçerik";
   const content = storyContent.innerHTML;
-  
+
   // Bugünün tarihini al
   const today = new Date();
-  const dateStr = today.toLocaleDateString('tr-TR');
-  
+  const dateStr = today.toLocaleDateString("tr-TR");
+
   // Print penceresi aç
   const printWindow = window.open("", "_blank");
   printWindow.document.write(`
@@ -448,9 +448,9 @@ function exportContentToPDF() {
       </body>
     </html>
   `);
-  
+
   printWindow.document.close();
-  
+
   // Kısa bir gecikme sonrasında print dialog'unu aç
   setTimeout(() => {
     printWindow.print();

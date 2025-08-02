@@ -19,7 +19,13 @@
       </div>
       <div class="teacher-panel">
         <div class="icon">👩‍🏫</div>
-        <span>Hoşgeldiniz, <strong>Ayşe Öğretmen</strong></span>
+        <span
+          >Hoşgeldiniz,
+          <strong>{{ user.full_name if user else "Öğretmen" }}</strong></span
+        >
+        <a href="/logout" class="logout-btn" title="Çıkış Yap">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
       </div>
     </header>
 
@@ -118,7 +124,8 @@
                 </button>
               </div>
             </div>
-          </div>          <div class="story-display" id="story-display" style="display: none">
+          </div>
+          <div class="story-display" id="story-display" style="display: none">
             <div class="story-header">
               <h2 id="content-display-title">📚 Hikaye</h2>
               <div class="story-actions">

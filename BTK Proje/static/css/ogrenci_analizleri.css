@@ -667,6 +667,25 @@ body {
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
+/* No students state */
+.no-students {
+  text-align: center;
+  color: #718096;
+  padding: 2rem;
+  opacity: 0.7;
+}
+
+.no-students i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.no-students p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .main-container {

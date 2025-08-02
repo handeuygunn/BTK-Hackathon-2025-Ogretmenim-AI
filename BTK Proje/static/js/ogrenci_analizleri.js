@@ -1,110 +1,81 @@
 // Öğrenci Analizleri JavaScript
 
-// Dummy öğrenci verileri
-const dummyStudents = [
-  {
-    id: 1,
-    name: "Ali Yılmaz",
-    age: 5,
-    avatar: "👦",
-    notes: [
-      {
-        id: 1,
-        content:
-          "Bugün çok aktif ve enerjikti. Diğer çocuklarla iyi etkileşim kurdu.",
-        category: "sosyal",
-        date: "2024-01-15",
-        categoryLabel: "Sosyal Beceriler",
-      },
-      {
-        id: 2,
-        content:
-          "Matematik etkinliklerinde zorlanıyor, ekstra destek gerekebilir.",
-        category: "akademik",
-        date: "2024-01-10",
-        categoryLabel: "Akademik",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Zeynep Kaya",
-    age: 4,
-    avatar: "👧",
-    notes: [
-      {
-        id: 3,
-        content: "Çok yaratıcı bir çocuk. Resim yapmayı çok seviyor.",
-        category: "yaraticilik",
-        date: "2024-01-14",
-        categoryLabel: "Yaratıcılık",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Mehmet Demir",
-    age: 5,
-    avatar: "👦",
-    notes: [
-      {
-        id: 4,
-        content:
-          "Bazen içine kapanık oluyor. Sosyal aktivitelere katılımı artırılmalı.",
-        category: "sosyal",
-        date: "2024-01-12",
-        categoryLabel: "Sosyal Beceriler",
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: "Ayşe Özkan",
-    age: 4,
-    avatar: "👧",
-    notes: [],
-  },
-  {
-    id: 5,
-    name: "Can Arslan",
-    age: 5,
-    avatar: "👦",
-    notes: [
-      {
-        id: 5,
-        content:
-          "Liderlik özellikleri gösteriyor. Grup etkinliklerini yönetmeyi seviyor.",
-        category: "sosyal",
-        date: "2024-01-13",
-        categoryLabel: "Sosyal Beceriler",
-      },
-    ],
-  },
-  {
-    id: 6,
-    name: "Elif Yıldız",
-    age: 4,
-    avatar: "👧",
-    notes: [],
-  },
-];
-
+let students = []; // Gerçek öğrenci verileri API'den gelecek
 let selectedStudent = null;
 let currentNotes = [];
 
 // Sayfa yüklendiğinde çalışacak fonksiyon
 document.addEventListener("DOMContentLoaded", function () {
-  loadStudents();
+  loadStudentsFromAPI();
   setupSearchFunctionality();
   setupEnterKeyForChat();
 });
+
+// API'den öğrencileri yükle
+async function loadStudentsFromAPI() {
+  try {
+    const response = await fetch("/api/students");
+    const data = await response.json();
+
+    if (data.success) {
+      students = data.students.map(student => ({
+        id: student.id,
+        name: `${student.name} ${student.surname}`,
+        age: calculateAge(student.birth_date) || 5, // Eğer yaş yoksa varsayılan 5
+        avatar: getRandomAvatar(),
+        class: student.class_name || student.sinif,
+        notes: [] // Notlar ayrı API'den gelecek
+      }));
+      loadStudents();
+    } else {
+      console.error("Öğrenci verilerini yüklerken hata:", data.error);
+      // Fallback olarak boş liste göster
+      students = [];
+      loadStudents();
+    }
+  } catch (error) {
+    console.error("API hatası:", error);
+    // Fallback olarak boş liste göster
+    students = [];
+    loadStudents();
+  }
+}
+
+// Rastgele avatar seç
+function getRandomAvatar() {
+  const avatars = ["👦", "👧"];
+  return avatars[Math.floor(Math.random() * avatars.length)];
+}
+
+// Yaş hesapla (doğum tarihinden)
+function calculateAge(birthDate) {
+  if (!birthDate) return null;
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
 
 // Öğrencileri yükle
 function loadStudents() {
   const studentsList = document.getElementById("students-list");
   studentsList.innerHTML = "";
 
-  dummyStudents.forEach((student) => {
+  if (students.length === 0) {
+    studentsList.innerHTML = `
+      <div class="no-students">
+        <i class="fas fa-users"></i>
+        <p>Henüz öğrenci bulunmuyor</p>
+      </div>
+    `;
+    return;
+  }
+
+  students.forEach((student) => {
     const studentItem = createStudentItem(student);
     studentsList.appendChild(studentItem);
   });
@@ -130,7 +101,6 @@ function createStudentItem(student) {
 // Öğrenci seç
 function selectStudent(student) {
   selectedStudent = student;
-  currentNotes = [...student.notes];
 
   // Önceki seçimi temizle
   document.querySelectorAll(".student-item").forEach((item) => {
@@ -153,11 +123,32 @@ function selectStudent(student) {
   // Chat'i sıfırla
   resetChat();
 
-  // Notları yükle
-  loadNotes();
+  // Notları API'den yükle
+  loadNotesFromAPI(student.id);
 
   // Chat tab'ını aktif yap
   switchTab("chat");
+}
+
+// API'den notları yükle
+async function loadNotesFromAPI(studentId) {
+  try {
+    const response = await fetch(`/api/student-notes/${studentId}`);
+    const data = await response.json();
+
+    if (data.success) {
+      currentNotes = data.notes;
+    } else {
+      console.error("Notları yüklerken hata:", data.error);
+      currentNotes = [];
+    }
+  } catch (error) {
+    console.error("API hatası:", error);
+    currentNotes = [];
+  }
+  
+  // Notları göster
+  loadNotes();
 }
 
 // Chat'i sıfırla
@@ -314,9 +305,19 @@ function filterStudents(searchTerm) {
   const studentsList = document.getElementById("students-list");
   studentsList.innerHTML = "";
 
-  const filteredStudents = dummyStudents.filter((student) =>
+  const filteredStudents = students.filter((student) =>
     student.name.toLowerCase().includes(searchTerm)
   );
+
+  if (filteredStudents.length === 0) {
+    studentsList.innerHTML = `
+      <div class="no-students">
+        <i class="fas fa-search"></i>
+        <p>Arama kriterine uygun öğrenci bulunamadı</p>
+      </div>
+    `;
+    return;
+  }
 
   filteredStudents.forEach((student) => {
     const studentItem = createStudentItem(student);
@@ -380,7 +381,7 @@ function closeNoteModal() {
 }
 
 // Notu kaydet
-function saveNote() {
+async function saveNote() {
   const noteText = document.getElementById("note-text").value.trim();
   const noteCategory = document.getElementById("note-category").value;
 
@@ -394,34 +395,63 @@ function saveNote() {
     return;
   }
 
-  const categoryLabels = {
-    genel: "Genel",
-    sosyal: "Sosyal Beceriler",
-    akademik: "Akademik",
-    yaraticilik: "Yaratıcılık",
-    davranis: "Davranış",
-  };
+  try {
+    // API'ye notu gönder
+    const response = await fetch("/api/student-notes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        student_id: selectedStudent.id,
+        content: noteText,
+        category: noteCategory
+      }),
+    });
 
-  const newNote = {
-    id: Date.now(),
-    content: noteText,
-    category: noteCategory,
-    categoryLabel: categoryLabels[noteCategory],
-    date: new Date().toISOString().split("T")[0],
-  };
+    const data = await response.json();
 
-  // Not'u ekle
-  currentNotes.unshift(newNote);
-  selectedStudent.notes.unshift(newNote);
+    if (data.success) {
+      // Başarılı kayıt sonrası notları yeniden yükle
+      await loadNotesFromAPI(selectedStudent.id);
+      
+      // Modal'ı kapat
+      closeNoteModal();
+      
+      // Başarı mesajı göster
+      showSuccessMessage("Gözlem başarıyla kaydedildi!");
+    } else {
+      alert("Not kaydedilirken hata oluştu: " + data.error);
+    }
+  } catch (error) {
+    console.error("API hatası:", error);
+    alert("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
+  }
+}
 
-  // Notları yeniden yükle
-  loadNotes();
-
-  // Modal'ı kapat
-  closeNoteModal();
-
-  // Başarı mesajı (isteğe bağlı)
-  console.log("Not kaydedildi:", newNote);
+// Başarı mesajı göster
+function showSuccessMessage(message) {
+  // Basit bir toast notification göster
+  const toast = document.createElement("div");
+  toast.style.cssText = `
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: #48bb78;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+  `;
+  toast.textContent = message;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }
 
 // Modal dışına tıklandığında kapat

@@ -15,6 +15,13 @@
       <div class="logo">🎓</div>
       <h1>Öğretmenim AI</h1>
 
+      {% if error %}
+      <div class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+      </div>
+      {% endif %}
+
       <div class="form-group">
         <label for="username">Kullanıcı Adı</label>
         <input

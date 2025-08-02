@@ -23,7 +23,12 @@
       </div>
       <div class="teacher-panel">
         <div class="icon">👩‍🏫</div>
-        <span><strong>Ayşe Öğretmen</strong></span>
+        <span
+          ><strong>{{ user.full_name if user else "Öğretmen" }}</strong></span
+        >
+        <a href="/logout" class="logout-btn" title="Çıkış Yap">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
       </div>
     </header>
 
