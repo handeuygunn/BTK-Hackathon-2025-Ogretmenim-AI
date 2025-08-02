@@ -402,6 +402,8 @@ async function saveNote() {
   saveButton.disabled = true;
 
   try {
+    console.log("DEBUG: Gözlem kaydediliyor...", { student_id: selectedStudent.id, content: noteText, category: noteCategory });
+    
     // API'ye gözlemi gönder - Gemini formatlaması ile
     const response = await fetch("/api/student-notes", {
       method: "POST",
@@ -416,6 +418,7 @@ async function saveNote() {
     });
 
     const data = await response.json();
+    console.log("DEBUG: API Response:", data);
 
     if (data.success) {
       // Gemini'nin formatladığı gözlemi göster
