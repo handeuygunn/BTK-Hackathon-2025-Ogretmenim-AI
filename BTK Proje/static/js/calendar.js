@@ -103,13 +103,15 @@ function createDayElement(day, className, month, year) {
   dayElement.textContent = day;
 
   // Tarih string'i oluştur
-  const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  
+  const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(
+    day
+  ).padStart(2, "0")}`;
+
   // Bu tarih için plan var mı kontrol et
-  const planForDate = dailyPlans.find(plan => plan.plan_date === dateString);
-  if (planForDate && !className.includes('other-month')) {
-    dayElement.classList.add('has-plan');
-    dayElement.title = 'Bu tarih için günlük plan mevcut';
+  const planForDate = dailyPlans.find((plan) => plan.plan_date === dateString);
+  if (planForDate && !className.includes("other-month")) {
+    dayElement.classList.add("has-plan");
+    dayElement.title = "Bu tarih için günlük plan mevcut";
   }
 
   // Tıklama olayı ekle
@@ -133,7 +135,7 @@ function selectDate(day, month, year, event, planForDate = null) {
   selectedDate = new Date(year, month, day);
 
   console.log("Seçilen tarih:", selectedDate.toLocaleDateString("tr-TR"));
-  
+
   // Eğer bu tarih için plan varsa modal'ı aç
   if (planForDate) {
     showPlanModal(planForDate);
@@ -209,24 +211,24 @@ async function loadDailyPlans() {
 // Plan modal'ını göster
 function showPlanModal(plan) {
   currentSelectedPlan = plan;
-  
+
   const modal = document.getElementById("plan-modal");
   const title = document.getElementById("plan-modal-title");
   const body = document.getElementById("plan-modal-body");
-  
+
   // Tarih formatla
   const planDate = new Date(plan.plan_date).toLocaleDateString("tr-TR", {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
-  
+
   title.innerHTML = `📅 ${planDate} - Günlük Plan`;
-  
+
   // Plan içeriğini formatla ve göster
   body.innerHTML = formatPlanContent(plan.content);
-  
+
   modal.classList.add("active");
   document.body.style.overflow = "hidden";
 }
@@ -268,17 +270,20 @@ function editPlan() {
 // Planı sil
 async function deletePlan() {
   if (!currentSelectedPlan) return;
-  
+
   const confirmDelete = confirm("Bu planı silmek istediğinizden emin misiniz?");
   if (!confirmDelete) return;
-  
+
   try {
-    const response = await fetch(`/api/delete-daily-plan/${currentSelectedPlan.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `/api/delete-daily-plan/${currentSelectedPlan.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const data = await response.json();
 
@@ -286,7 +291,7 @@ async function deletePlan() {
       // Başarılı silme
       alert("Plan başarıyla silindi!");
       closePlanModal();
-      
+
       // Planları yeniden yükle ve takvimi güncelle
       await loadDailyPlans();
       generateCalendar(currentMonth, currentYear);
