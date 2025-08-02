@@ -186,6 +186,148 @@ function switchTab(tabName) {
     .querySelector(`[onclick="switchTab('${tabName}')"]`)
     .classList.add("active");
   document.getElementById(`${tabName}-tab`).classList.add("active");
+
+  // Progress tab'ına geçildiğinde gelişim analizini yükle
+  if (tabName === "progress" && selectedStudent) {
+    loadStudentProgress();
+  }
+}
+
+// Öğrenci gelişim analizi yükle
+async function loadStudentProgress() {
+  console.log("DEBUG: loadStudentProgress çağrıldı");
+
+  if (!selectedStudent) {
+    console.error("DEBUG: Seçili öğrenci yok");
+    return;
+  }
+
+  const progressContainer = document.querySelector(
+    "#progress-tab .progress-cards"
+  );
+  if (!progressContainer) {
+    console.error("DEBUG: Progress container bulunamadı");
+    return;
+  }
+
+  // Loading göster
+  progressContainer.innerHTML = `
+    <div style="text-align: center; padding: 2rem;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #667eea;"></i>
+      <p style="margin-top: 1rem; color: #718096;">Gemini AI ile gelişim analizi yapılıyor...</p>
+    </div>
+  `;
+
+  try {
+    console.log(
+      `DEBUG: ${selectedStudent.id} için gelişim analizi getiriliyor...`
+    );
+
+    const response = await fetch(
+      `/api/student-progress/${selectedStudent.id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = await response.json();
+    console.log("DEBUG: Progress API Response:", data);
+
+    if (data.success) {
+      displayStudentProgress(data);
+    } else {
+      throw new Error(data.error || "Gelişim analizi yüklenirken hata oluştu");
+    }
+  } catch (error) {
+    console.error("DEBUG: Progress API hatası:", error);
+    progressContainer.innerHTML = `
+      <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+        <p>Gelişim analizi yüklenirken hata oluştu.</p>
+        <button onclick="loadStudentProgress()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Tekrar Dene
+        </button>
+      </div>
+    `;
+  }
+}
+
+// Gelişim analizini göster
+function displayStudentProgress(data) {
+  console.log("DEBUG: displayStudentProgress çağrıldı", data);
+
+  const progressContainer = document.querySelector(
+    "#progress-tab .progress-cards"
+  );
+
+  // Puan renklerini belirle
+  function getScoreColor(score) {
+    if (score >= 80) return "#22c55e"; // Yeşil
+    if (score >= 60) return "#eab308"; // Sarı
+    if (score >= 40) return "#f97316"; // Turuncu
+    return "#ef4444"; // Kırmızı
+  }
+
+  // Puan seviyesini belirle
+  function getScoreLevel(score) {
+    if (score >= 80) return "Mükemmel";
+    if (score >= 60) return "İyi";
+    if (score >= 40) return "Orta";
+    return "Geliştirilmeli";
+  }
+
+  // Progress card'ları oluştur
+  const progressCards = [
+    { key: "yaraticilik", title: "Yaratıcılık", icon: "🎨" },
+    { key: "sosyal", title: "Sosyal Beceriler", icon: "🤝" },
+    { key: "genel", title: "Genel Gelişim", icon: "📈" },
+    { key: "davranis", title: "Davranış", icon: "😊" },
+    { key: "akademik", title: "Akademik Gelişim", icon: "📚" },
+  ];
+
+  let progressHTML = "";
+
+  progressCards.forEach((card) => {
+    const score = data.scores[card.key] || 75;
+    const color = getScoreColor(score);
+    const level = getScoreLevel(score);
+
+    progressHTML += `
+      <div class="progress-card">
+        <div class="progress-icon">${card.icon}</div>
+        <div class="progress-info">
+          <h5>${card.title}</h5>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${score}%; background-color: ${color};"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+            <span style="color: ${color}; font-weight: 600;">${level}</span>
+            <span style="color: #4a5568; font-weight: 600;">${score}/100</span>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Gemini analizini ekle
+  progressHTML += `
+    <div style="grid-column: 1 / -1; margin-top: 1rem;">
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);">
+        <h4 style="color: #2d3748; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-robot" style="color: #667eea;"></i>
+          Gemini AI Gelişim Analizi
+        </h4>
+        <div style="white-space: pre-wrap; line-height: 1.6; color: #4a5568;">
+          ${data.analysis}
+        </div>
+      </div>
+    </div>
+  `;
+
+  progressContainer.innerHTML = progressHTML;
 }
 
 // Mesaj gönder
