@@ -14,11 +14,17 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Sayfayı başlat
-function initializePage() {
+async function initializePage() {
   // Bugünün tarihini default olarak seç (takvim için)
   const today = new Date().toISOString().split("T")[0];
   // Kaydetme modal'ındaki tarihi bugün yap
   document.getElementById("plan-date-save").value = today;
+
+  // Kayıtlı planları yükle
+  await loadSavedPlans();
+
+  // Takvimi yükle
+  loadCalendar();
 }
 
 // Event listener'ları kur
@@ -316,52 +322,56 @@ function closeSaveModal() {
 }
 
 // Planı kaydetmeyi onayla
-function confirmSavePlan() {
+async function confirmSavePlan() {
   const title = document.getElementById("plan-title").value.trim();
   const date = document.getElementById("plan-date-save").value;
-  const startTime = document.getElementById("start-time").value;
-  const endTime = document.getElementById("end-time").value;
   const notes = document.getElementById("plan-notes").value.trim();
-
-  if (!title) {
-    alert("Lütfen plan başlığını girin.");
-    return;
-  }
 
   if (!date) {
     alert("Lütfen tarihi seçin.");
     return;
   }
 
-  const savedPlan = {
-    id: Date.now(),
-    title: title,
-    content: currentPlan.content,
-    date: date,
-    startTime: startTime,
-    endTime: endTime,
-    notes: notes,
-    createdAt: new Date(),
-  };
+  if (!currentPlan) {
+    alert("Kaydedilecek plan bulunamadı.");
+    return;
+  }
 
-  // Planı kaydet
-  savedPlans.push(savedPlan);
+  try {
+    // API'ye günlük planı kaydet
+    const response = await fetch("/api/save-daily-plan", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        plan_date: date,
+        content: currentPlan.content,
+      }),
+    });
 
-  // LocalStorage'a kaydet
-  localStorage.setItem("savedPlans", JSON.stringify(savedPlans));
+    const data = await response.json();
 
-  // UI'ı güncelle
-  loadSavedPlans();
-  loadCalendar();
+    if (data.success) {
+      // UI'ı güncelle
+      await loadSavedPlans();
+      loadCalendar();
 
-  // Modal'ı kapat
-  closeSaveModal();
+      // Modal'ı kapat
+      closeSaveModal();
 
-  // Başarı mesajı
-  addMessageToChat(
-    `✅ "${title}" başlıklı plan ${formatDate(date)} tarihine kaydedildi.`,
-    "bot"
-  );
+      // Başarı mesajı
+      addMessageToChat(
+        `✅ Günlük plan ${formatDate(date)} tarihine ${data.action}!`,
+        "bot"
+      );
+    } else {
+      alert("Plan kaydetme hatası: " + data.error);
+    }
+  } catch (error) {
+    console.error("Save plan error:", error);
+    alert("Plan kaydedilirken bir hata oluştu.");
+  }
 }
 
 // PDF'e aktar
@@ -475,7 +485,7 @@ function loadCalendar() {
 
 // Belirli bir tarih için plan var mı kontrol et
 function hasPlansForDate(dateString) {
-  return savedPlans.some((plan) => plan.date === dateString);
+  return savedPlans.some((plan) => plan.plan_date === dateString);
 }
 
 // Takvim seçimini güncelle
@@ -502,36 +512,55 @@ function nextMonth() {
 }
 
 // Kayıtlı planları yükle
-function loadSavedPlans() {
-  // LocalStorage'dan planları yükle
-  const stored = localStorage.getItem("savedPlans");
-  if (stored) {
-    savedPlans = JSON.parse(stored);
-  }
+async function loadSavedPlans() {
+  try {
+    // API'den kayıtlı planları çek
+    const response = await fetch("/api/get-daily-plans", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  const savedPlansList = document.getElementById("saved-plans-list");
-  savedPlansList.innerHTML = "";
+    const data = await response.json();
 
-  if (savedPlans.length === 0) {
+    const savedPlansList = document.getElementById("saved-plans-list");
+    savedPlansList.innerHTML = "";
+
+    if (!data.success || data.plans.length === 0) {
+      savedPlansList.innerHTML = `
+        <div style="text-align: center; color: #718096; padding: 2rem;">
+          <i class="fas fa-calendar-check" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;"></i>
+          <p>Henüz kayıtlı plan yok.</p>
+        </div>
+      `;
+      savedPlans = [];
+      return;
+    }
+
+    // Global savedPlans array'ini güncelle
+    savedPlans = data.plans;
+
+    // Planları tarihe göre sırala (en yeni üstte)
+    const sortedPlans = [...savedPlans].sort(
+      (a, b) => new Date(b.plan_date) - new Date(a.plan_date)
+    );
+
+    sortedPlans.slice(0, 5).forEach((plan) => {
+      // Son 5 planı göster
+      const planItem = createSavedPlanItem(plan);
+      savedPlansList.appendChild(planItem);
+    });
+  } catch (error) {
+    console.error("Load saved plans error:", error);
+    const savedPlansList = document.getElementById("saved-plans-list");
     savedPlansList.innerHTML = `
-            <div style="text-align: center; color: #718096; padding: 2rem;">
-                <i class="fas fa-calendar-check" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;"></i>
-                <p>Henüz kayıtlı plan yok.</p>
-            </div>
-        `;
-    return;
+      <div style="text-align: center; color: #e53e3e; padding: 2rem;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+        <p>Planlar yüklenirken hata oluştu.</p>
+      </div>
+    `;
   }
-
-  // Planları tarihe göre sırala (en yeni üstte)
-  const sortedPlans = [...savedPlans].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
-
-  sortedPlans.slice(0, 5).forEach((plan) => {
-    // Son 5 planı göster
-    const planItem = createSavedPlanItem(plan);
-    savedPlansList.appendChild(planItem);
-  });
 }
 
 // Kayıtlı plan item'ı oluştur
@@ -540,34 +569,52 @@ function createSavedPlanItem(plan) {
   div.className = "saved-plan-item";
   div.onclick = () => loadSavedPlan(plan);
 
-  const date = formatDate(plan.date);
-  const timeRange = `${plan.startTime} - ${plan.endTime}`;
+  const date = formatDate(plan.plan_date);
+  const createdDate = new Date(plan.created_at).toLocaleDateString("tr-TR");
+
+  // Plan içeriğinden başlık çıkarmaya çalış
+  const planTitle = extractPlanTitle(plan.content) || `Plan - ${date}`;
 
   div.innerHTML = `
-        <div class="plan-item-header">
-            <span class="plan-title">${plan.title}</span>
-            <span class="plan-date">${new Date(plan.date).toLocaleDateString(
-              "tr-TR"
-            )}</span>
-        </div>
-        <div class="plan-time">${timeRange}</div>
-    `;
+    <div class="plan-item-header">
+      <span class="plan-title">${planTitle}</span>
+      <span class="plan-date">${new Date(plan.plan_date).toLocaleDateString(
+        "tr-TR"
+      )}</span>
+    </div>
+    <div class="plan-time">Oluşturulma: ${createdDate}</div>
+  `;
 
   return div;
+}
+
+// Plan içeriğinden başlık çıkar
+function extractPlanTitle(content) {
+  // İlk h1 başlığını bul
+  const match = content.match(/<h1>(.*?)<\/h1>|^#\s*(.*?)$/m);
+  if (match) {
+    return match[1] || match[2];
+  }
+
+  // H1 yoksa ilk birkaç kelimeyi al
+  const textOnly = content.replace(/<[^>]*>/g, "").trim();
+  const words = textOnly.split(" ").slice(0, 5).join(" ");
+  return words.length > 50 ? words.substring(0, 50) + "..." : words;
 }
 
 // Kayıtlı planı yükle
 function loadSavedPlan(plan) {
   // Plan çıktısını göster
-  displayPlanOutput(plan.content, plan.date);
+  displayPlanOutput(plan.content, plan.plan_date);
 
   // Current plan'ı güncelle
   currentPlan = {
     content: plan.content,
-    date: plan.date,
-    timestamp: new Date(plan.createdAt),
+    date: plan.plan_date,
+    timestamp: new Date(plan.created_at),
   };
 
-  // Chat'e bilgi mesajı ekle
-  addMessageToChat(`📋 "${plan.title}" planı yüklendi.`, "bot");
+  // Plan başlığını çıkar ve mesajda göster
+  const planTitle = extractPlanTitle(plan.content) || "Plan";
+  addMessageToChat(`📋 "${planTitle}" planı yüklendi.`, "bot");
 }
