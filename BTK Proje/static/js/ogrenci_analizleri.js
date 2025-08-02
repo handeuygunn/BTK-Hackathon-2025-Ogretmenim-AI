@@ -383,7 +383,7 @@ function closeNoteModal() {
 // Notu kaydet
 async function saveNote() {
   console.log("DEBUG: saveNote fonksiyonu çağrıldı");
-  
+
   const noteText = document.getElementById("note-text").value.trim();
   const noteCategory = document.getElementById("note-category").value;
 
@@ -407,7 +407,7 @@ async function saveNote() {
     console.error("DEBUG: Save button bulunamadı!");
     return;
   }
-  
+
   const originalText = saveButton.textContent;
   saveButton.textContent = "Kaydediliyor...";
   saveButton.disabled = true;
