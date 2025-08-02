@@ -451,3 +451,171 @@ body::before {
     font-size: 1rem;
   }
 }
+
+/* Plan Modal Styles */
+.plan-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.plan-modal.active {
+  display: flex;
+}
+
+.plan-modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.plan-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.plan-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.plan-modal-header .close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.plan-modal-header .close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.plan-modal-body {
+  padding: 2rem;
+  color: #2d3748;
+  line-height: 1.6;
+}
+
+.plan-modal-body h1,
+.plan-modal-body h2,
+.plan-modal-body h3 {
+  color: #667eea;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.plan-modal-body h1 {
+  font-size: 1.8rem;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+.plan-modal-body h2 {
+  font-size: 1.4rem;
+}
+
+.plan-modal-body h3 {
+  font-size: 1.2rem;
+}
+
+.plan-modal-body ul,
+.plan-modal-body ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.plan-modal-body li {
+  margin-bottom: 0.5rem;
+}
+
+.plan-modal-body strong {
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.plan-modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.plan-action-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plan-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.plan-action-btn:last-child {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+}
+
+.plan-action-btn:last-child:hover {
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+}
+
+/* Plan var olan günler için stil */
+.calendar-day.has-plan {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: bold;
+  position: relative;
+}
+
+.calendar-day.has-plan::after {
+  content: "📅";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.7rem;
+}

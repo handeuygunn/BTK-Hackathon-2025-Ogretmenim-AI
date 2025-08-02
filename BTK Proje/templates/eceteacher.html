@@ -140,10 +140,33 @@
             <div class="story-content" id="story-content">
               <!-- İçerik buraya gelecek -->
             </div>
-          </div>
+          </div>        </div>
+      </div>
+    </div>
+
+    <!-- Plan Görüntüleme Modal -->
+    <div id="plan-modal" class="plan-modal">
+      <div class="plan-modal-content">
+        <div class="plan-modal-header">
+          <h3 id="plan-modal-title">📅 Günlük Plan</h3>
+          <button class="close-btn" onclick="closePlanModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="plan-modal-body" id="plan-modal-body">
+          <!-- Plan içeriği buraya gelecek -->
+        </div>
+        <div class="plan-modal-footer">
+          <button class="plan-action-btn" onclick="editPlan()">
+            <i class="fas fa-edit"></i> Düzenle
+          </button>
+          <button class="plan-action-btn" onclick="deletePlan()">
+            <i class="fas fa-trash"></i> Sil
+          </button>
         </div>
       </div>
     </div>
+
     <script src="/static/js/chatbot.js"></script>
     <script src="/static/js/calendar.js"></script>
   </body>
