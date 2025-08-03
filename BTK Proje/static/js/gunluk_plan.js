@@ -25,7 +25,10 @@ async function initializePage() {
     localStorage.removeItem("editPlanDate"); // Kullandıktan sonra temizle
   } else {
     // Yoksa bugünün tarihini kullan
-    selectedDate = new Date().toISOString().split("T")[0];
+    const today = new Date();
+    selectedDate = `${today.getFullYear()}-${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   }
 
   // Kaydetme modal'ındaki tarihi seç
@@ -187,7 +190,11 @@ async function sendMessage() {
     // FormData oluştur
     const formData = new FormData();
     formData.append("message", message);
-    formData.append("date", new Date().toISOString().split("T")[0]); // Bugünün tarihi
+    const today = new Date();
+    const todayString = `${today.getFullYear()}-${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    formData.append("date", todayString); // Bugünün tarihi
     formData.append("category", "Günlük Plan");
 
     if (uploadedPDF) {
@@ -210,7 +217,10 @@ async function sendMessage() {
       addMessageToChat(data.response, "bot");
 
       // Plan çıktısını göster
-      const todayDate = new Date().toISOString().split("T")[0];
+      const today = new Date();
+      const todayDate = `${today.getFullYear()}-${String(
+        today.getMonth() + 1
+      ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
       displayPlanOutput(data.response, todayDate);
 
       // Plan verilerini sakla
@@ -492,8 +502,11 @@ function loadCalendar() {
     const dateString = dayDate.toISOString().split("T")[0];
 
     // Bugünü işaretle
-    const today = new Date().toISOString().split("T")[0];
-    if (dateString === today) {
+    const today = new Date();
+    const todayString = `${today.getFullYear()}-${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    if (dateString === todayString) {
       dayDiv.classList.add("today");
     }
 
