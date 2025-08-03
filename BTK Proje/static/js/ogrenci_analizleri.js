@@ -884,16 +884,21 @@ function showSuccessMessage(message) {
 }
 
 // Formatlanmış gözlemi göster
-function showFormattedObservation(originalContent, formattedContent, originalCategory, geminiResponse) {
+function showFormattedObservation(
+  originalContent,
+  formattedContent,
+  originalCategory,
+  geminiResponse
+) {
   // Mevcut modal varsa kaldır
-  const existingModal = document.querySelector('.formatted-observation-modal');
+  const existingModal = document.querySelector(".formatted-observation-modal");
   if (existingModal) {
     existingModal.remove();
   }
 
   // Modal oluştur
-  const modal = document.createElement('div');
-  modal.className = 'formatted-observation-modal';
+  const modal = document.createElement("div");
+  modal.className = "formatted-observation-modal";
   modal.style.cssText = `
     position: fixed;
     top: 0;
@@ -908,7 +913,7 @@ function showFormattedObservation(originalContent, formattedContent, originalCat
     animation: fadeIn 0.3s ease-out;
   `;
 
-  const modalContent = document.createElement('div');
+  const modalContent = document.createElement("div");
   modalContent.style.cssText = `
     background: white;
     border-radius: 12px;
@@ -959,9 +964,9 @@ function showFormattedObservation(originalContent, formattedContent, originalCat
   modal.appendChild(modalContent);
 
   // CSS animasyonları ekle
-  if (!document.querySelector('#formatted-observation-animation-style')) {
-    const style = document.createElement('style');
-    style.id = 'formatted-observation-animation-style';
+  if (!document.querySelector("#formatted-observation-animation-style")) {
+    const style = document.createElement("style");
+    style.id = "formatted-observation-animation-style";
     style.textContent = `
       @keyframes fadeIn {
         from { opacity: 0; }
@@ -989,18 +994,18 @@ function showFormattedObservation(originalContent, formattedContent, originalCat
   document.body.appendChild(modal);
 
   // Modal dışına tıklandığında kapat
-  modal.addEventListener('click', function(e) {
+  modal.addEventListener("click", function (e) {
     if (e.target === modal) {
       modal.remove();
     }
   });
 
   // ESC tuşu ile kapat
-  const handleEscape = function(e) {
-    if (e.key === 'Escape') {
+  const handleEscape = function (e) {
+    if (e.key === "Escape") {
       modal.remove();
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     }
   };
-  document.addEventListener('keydown', handleEscape);
+  document.addEventListener("keydown", handleEscape);
 }
