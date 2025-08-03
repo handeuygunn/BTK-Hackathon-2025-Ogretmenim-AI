@@ -533,6 +533,9 @@ function createNoteItem(note) {
         <div class="note-header">
             <span class="note-category">${note.categoryLabel}</span>
             <span class="note-date">${date}</span>
+            <button class="delete-note-btn" onclick="deleteNote(${note.id})" title="Gözlemi Sil">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
         <div class="note-content">${note.content}</div>
     `;
@@ -647,6 +650,49 @@ async function saveNote() {
     // Button'ı eski haline döndür
     saveButton.textContent = originalText;
     saveButton.disabled = false;
+  }
+}
+
+// Gözlemi sil
+async function deleteNote(noteId) {
+  if (!confirm("Bu gözlemi silmek istediğinizden emin misiniz?")) {
+    return;
+  }
+
+  try {
+    console.log(`DEBUG: Gözlem siliniyor... ID: ${noteId}`);
+
+    const response = await fetch(`/api/student-notes/${noteId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log("DEBUG: Delete API Response:", data);
+
+    if (data.success) {
+      // Notları yeniden yükle
+      await loadNotesFromAPI(selectedStudent.id);
+
+      // Chat'i güncelle (gözlem sayısı değiştiği için)
+      if (
+        document
+          .querySelector(".tab-btn.active")
+          ?.textContent.includes("Analiz Sohbeti")
+      ) {
+        updateChatWithNewObservationCount();
+      }
+
+      // Başarı mesajı göster
+      showSuccessMessage("Gözlem başarıyla silindi!");
+    } else {
+      alert("Gözlem silinirken hata oluştu: " + data.error);
+    }
+  } catch (error) {
+    console.error("API hatası:", error);
+    alert("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
   }
 }
 
