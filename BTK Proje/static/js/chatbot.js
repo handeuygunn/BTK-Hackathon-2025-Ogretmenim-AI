@@ -13,7 +13,8 @@ function openChatbot(category) {
   // Kategori bazında başlık ve icon belirleme
   const categoryInfo = {
     "Günlük Plan": { icon: "📅", title: "Günlük Plan Asistanı" },
-    "Etkinlik/Oyun Planı": { icon: "🎮", title: "Etkinlik & Oyun Asistanı" },
+    "Etkinlik/Oyun Planı": { icon: "🎯", title: "Etkinlik Asistanı" },
+    "Oyun Planı": { icon: "🎮", title: "Oyun Asistanı" },
     "Öğrenci Analizleri": { icon: "📊", title: "Öğrenci Analiz Asistanı" },
     Hikayeler: { icon: "📚", title: "Hikaye Asistanı" },
     Takvim: { icon: "🗓️", title: "Takvim Asistanı" },
@@ -31,7 +32,12 @@ function openChatbot(category) {
     container.classList.add("activity-mode");
     storyDisplay.style.display = "flex";
     document.getElementById("content-display-title").innerHTML =
-      "🎮 Etkinlik Planı";
+      "🎯 Etkinlik Planı";
+  } else if (category === "Oyun Planı") {
+    container.classList.add("activity-mode");
+    storyDisplay.style.display = "flex";
+    document.getElementById("content-display-title").innerHTML =
+      "🎮 Oyun Planı";
   } else {
     container.classList.remove("story-mode", "activity-mode");
     storyDisplay.style.display = "none";
@@ -76,7 +82,9 @@ function showWelcomeMessage(category) {
     "Günlük Plan":
       "Merhaba! Ben günlük eğitim planlarınızı oluşturmanıza yardımcı olacağım. Hangi yaş grubu için plan hazırlamak istiyorsunuz?",
     "Etkinlik/Oyun Planı":
-      "Merhaba! Çocuklarınız için eğlenceli ve eğitici etkinlikler planlayalım. Hangi konuda yardıma ihtiyacınız var?",
+      "Merhaba! Çocuklarınız için eğitici etkinlikler planlayalım. Hangi konuda yardıma ihtiyacınız var?",
+    "Oyun Planı":
+      "Merhaba! Çocuklarınız için eğlenceli ve interaktif oyunlar planlayalım. Hangi türde oyun düşünüyorsunuz?",
     "Öğrenci Analizleri":
       "Merhaba! Öğrencilerinizin gelişimini değerlendirmenize yardımcı olacağım. Hangi alanda analiz yapmak istiyorsunuz?",
     Hikayeler:
@@ -127,10 +135,12 @@ async function sendMessage() {
     if (data.success) {
       addMessage(data.response, "bot");
 
-      // Hikayeler ve Etkinlik/Oyun Planı kategorilerinde yanıtı ayrıca sağ panelde göster
+      // Hikayeler, Etkinlik ve Oyun Planı kategorilerinde yanıtı ayrıca sağ panelde göster
       if (currentCategory === "Hikayeler") {
         displayStory(data.response);
       } else if (currentCategory === "Etkinlik/Oyun Planı") {
+        displayActivity(data.response);
+      } else if (currentCategory === "Oyun Planı") {
         displayActivity(data.response);
       }
     } else {
