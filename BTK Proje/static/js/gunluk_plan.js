@@ -466,7 +466,8 @@ function loadCalendar() {
     0
   );
   const daysInMonth = lastDay.getDate();
-  const startingDayOfWeek = firstDay.getDay();
+  // Pazartesi'yi 0 yapmak için (0=Pazar -> 6=Pazartesi olarak düzenle)
+  const startingDayOfWeek = (firstDay.getDay() + 6) % 7;
 
   calendarDays.innerHTML = "";
 
