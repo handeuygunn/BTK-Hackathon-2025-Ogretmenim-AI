@@ -607,6 +607,10 @@ async function saveNote() {
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const data = await response.json();
     console.log("DEBUG: API Response:", data);
 
@@ -637,15 +641,24 @@ async function saveNote() {
       closeNoteModal();
 
       // Başarı mesajı göster
-      showSuccessMessage(
-        "Gözlem Gemini AI tool call ile formatlandı ve kaydedildi!"
-      );
+      showSuccessMessage("Gözlem Gemini AI ile formatlandı ve kaydedildi!");
     } else {
-      alert("Gözlem kaydedilirken hata oluştu: " + data.error);
+      throw new Error(data.error || "Gözlem kaydetme işlemi başarısız");
     }
   } catch (error) {
     console.error("API hatası:", error);
-    alert("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
+
+    // Hata mesajını daha anlaşılır yap
+    let errorMessage = "Bağlantı hatası oluştu. Lütfen tekrar deneyin.";
+    if (error.message && error.message !== "Failed to fetch") {
+      if (error.message.includes("HTTP error")) {
+        errorMessage = "Sunucu hatası oluştu. Lütfen tekrar deneyin.";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+
+    alert(errorMessage);
   } finally {
     // Button'ı eski haline döndür
     saveButton.textContent = originalText;
