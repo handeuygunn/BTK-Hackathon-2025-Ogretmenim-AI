@@ -840,7 +840,7 @@ function showSuccessMessage(message) {
   `;
   successDiv.textContent = message;
 
-  // CSS animasyonu ekle
+  // CSS animasyonları ekle
   if (!document.querySelector("#success-animation-style")) {
     const style = document.createElement("style");
     style.id = "success-animation-style";
@@ -881,4 +881,126 @@ function showSuccessMessage(message) {
       }
     }, 300);
   }, 3000);
+}
+
+// Formatlanmış gözlemi göster
+function showFormattedObservation(originalContent, formattedContent, originalCategory, geminiResponse) {
+  // Mevcut modal varsa kaldır
+  const existingModal = document.querySelector('.formatted-observation-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Modal oluştur
+  const modal = document.createElement('div');
+  modal.className = 'formatted-observation-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease-out;
+  `;
+
+  const modalContent = document.createElement('div');
+  modalContent.style.cssText = `
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    animation: slideInUp 0.3s ease-out;
+  `;
+
+  modalContent.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h3 style="margin: 0; color: #2d3748; font-size: 20px;">🤖 AI Formatlanmış Gözlem</h3>
+      <button onclick="this.closest('.formatted-observation-modal').remove()" 
+              style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;">
+        ×
+      </button>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+      <h4 style="margin: 0 0 8px 0; color: #4a5568; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+        📝 Orijinal Gözlem
+      </h4>
+      <div style="background: #f7fafc; border-left: 4px solid #e2e8f0; padding: 12px 16px; border-radius: 6px; color: #2d3748; font-size: 14px; line-height: 1.5;">
+        ${originalContent}
+      </div>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+      <h4 style="margin: 0 0 8px 0; color: #4a5568; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+        ✨ AI Formatlanmış Hali
+      </h4>
+      <div style="background: #f0fff4; border-left: 4px solid #48bb78; padding: 12px 16px; border-radius: 6px; color: #2d3748; font-size: 14px; line-height: 1.5; font-weight: 500;">
+        ${formattedContent}
+      </div>
+    </div>
+    
+    <div style="text-align: right; margin-top: 24px;">
+      <button onclick="this.closest('.formatted-observation-modal').remove()" 
+              style="background: #4299e1; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">
+        Tamam
+      </button>
+    </div>
+  `;
+
+  modal.appendChild(modalContent);
+
+  // CSS animasyonları ekle
+  if (!document.querySelector('#formatted-observation-animation-style')) {
+    const style = document.createElement('style');
+    style.id = 'formatted-observation-animation-style';
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes slideInUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .formatted-observation-modal button:hover {
+        background: #3182ce !important;
+        color: white;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Modal'ı sayfaya ekle
+  document.body.appendChild(modal);
+
+  // Modal dışına tıklandığında kapat
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+
+  // ESC tuşu ile kapat
+  const handleEscape = function(e) {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
 }
