@@ -660,7 +660,9 @@ async function deleteNote(noteId) {
   }
 
   // Delete butonunu devre dışı bırak
-  const deleteButton = document.querySelector(`button[onclick="deleteNote(${noteId})"]`);
+  const deleteButton = document.querySelector(
+    `button[onclick="deleteNote(${noteId})"]`
+  );
   if (deleteButton) {
     deleteButton.disabled = true;
     deleteButton.textContent = "Siliniyor...";
@@ -703,15 +705,15 @@ async function deleteNote(noteId) {
     }
   } catch (error) {
     console.error("API hatası:", error);
-    
+
     // Hata mesajını daha anlaşılır yap
     let errorMessage = "Bağlantı hatası oluştu. Lütfen tekrar deneyin.";
     if (error.message && error.message !== "Failed to fetch") {
       errorMessage = error.message;
     }
-    
+
     alert(errorMessage);
-    
+
     // Delete butonunu tekrar aktif et
     if (deleteButton) {
       deleteButton.disabled = false;
@@ -795,4 +797,75 @@ function formatMarkdownToHTML(text) {
   }
 
   return formatted;
+}
+
+// Başarı mesajı göster
+function showSuccessMessage(message) {
+  // Mevcut mesaj varsa kaldır
+  const existingMessage = document.querySelector(".success-message");
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+
+  // Yeni başarı mesajı oluştur
+  const successDiv = document.createElement("div");
+  successDiv.className = "success-message";
+  successDiv.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideInRight 0.3s ease-out;
+  `;
+  successDiv.textContent = message;
+
+  // CSS animasyonu ekle
+  if (!document.querySelector("#success-animation-style")) {
+    const style = document.createElement("style");
+    style.id = "success-animation-style";
+    style.textContent = `
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Sayfaya ekle
+  document.body.appendChild(successDiv);
+
+  // 3 saniye sonra mesajı kaldır
+  setTimeout(() => {
+    successDiv.style.animation = "slideOutRight 0.3s ease-in";
+    setTimeout(() => {
+      if (successDiv.parentNode) {
+        successDiv.parentNode.removeChild(successDiv);
+      }
+    }, 300);
+  }, 3000);
 }
