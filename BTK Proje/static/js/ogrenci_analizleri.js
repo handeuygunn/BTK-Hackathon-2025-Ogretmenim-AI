@@ -659,6 +659,13 @@ async function deleteNote(noteId) {
     return;
   }
 
+  // Delete butonunu devre dışı bırak
+  const deleteButton = document.querySelector(`button[onclick="deleteNote(${noteId})"]`);
+  if (deleteButton) {
+    deleteButton.disabled = true;
+    deleteButton.textContent = "Siliniyor...";
+  }
+
   try {
     console.log(`DEBUG: Gözlem siliniyor... ID: ${noteId}`);
 
@@ -668,6 +675,10 @@ async function deleteNote(noteId) {
         "Content-Type": "application/json",
       },
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     const data = await response.json();
     console.log("DEBUG: Delete API Response:", data);
@@ -688,11 +699,24 @@ async function deleteNote(noteId) {
       // Başarı mesajı göster
       showSuccessMessage("Gözlem başarıyla silindi!");
     } else {
-      alert("Gözlem silinirken hata oluştu: " + data.error);
+      throw new Error(data.error || "Silme işlemi başarısız");
     }
   } catch (error) {
     console.error("API hatası:", error);
-    alert("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
+    
+    // Hata mesajını daha anlaşılır yap
+    let errorMessage = "Bağlantı hatası oluştu. Lütfen tekrar deneyin.";
+    if (error.message && error.message !== "Failed to fetch") {
+      errorMessage = error.message;
+    }
+    
+    alert(errorMessage);
+    
+    // Delete butonunu tekrar aktif et
+    if (deleteButton) {
+      deleteButton.disabled = false;
+      deleteButton.textContent = "🗑️";
+    }
   }
 }
 
