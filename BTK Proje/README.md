@@ -18,7 +18,7 @@ BTK Proje/
 ├── README.md                # Proje dokümantasyonu
 ├── templates/               # HTML şablonları
 │   ├── login.html          # Giriş sayfası
-│   ├── eceteacher.html     # Ana dashboard
+│   ├── dashboard.html     # Ana dashboard
 │   └── boyama_sayfasi.html # Boyama sayfası
 └── static/                 # Statik dosyalar
     ├── css/                # Stil dosyaları
