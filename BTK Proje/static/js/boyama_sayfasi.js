@@ -75,8 +75,8 @@ async function sendMessage() {
       addMessage(data.response, "bot");
 
       // Eğer görsel varsa galeriye ekle
-      if (data.image) {
-        addImageToGallery(data.image, message);
+      if (data.image_url) {
+        addImageToGallery(data.image_url, message);
       }
     } else {
       addMessage("Üzgünüm, bir hata oluştu: " + data.error, "bot");
@@ -131,7 +131,7 @@ function hideTypingIndicator() {
 }
 
 // Görseli galeriye ekle
-function addImageToGallery(imageData, requestText) {
+function addImageToGallery(imageUrl, requestText) {
   const galleryContent = document.getElementById("gallery-content");
   const emptyGallery = galleryContent.querySelector(".empty-gallery");
   if (emptyGallery) {
@@ -150,14 +150,14 @@ function addImageToGallery(imageData, requestText) {
   });
 
   imageItem.innerHTML = `
-        <img class="gallery-image" src="data:image/png;base64,${imageData}" alt="Oluşturulan görsel ${imageId}" onclick="openImageModal(this.src, '${requestText}', '${imageData}')">
+        <img class="gallery-image" src="${imageUrl}" alt="Oluşturulan görsel ${imageId}" onclick="openImageModal('${imageUrl}', '${requestText}', '')">
         <div class="gallery-item-actions">
             <div class="item-info">
                 <div class="item-title">Görsel ${imageId}</div>
                 <div class="item-time">${currentTime}</div>
             </div>
             <div class="item-actions">
-                <button class="action-btn" onclick="downloadImage('${imageData}', 'boyama-sayfasi-${imageId}.png')" title="İndir">
+                <button class="action-btn" onclick="downloadImageFromUrl('${imageUrl}', 'boyama-sayfasi-${imageId}.png')" title="İndir">
                     <i class="fas fa-download"></i>
                 </button>
                 <button class="action-btn" onclick="removeFromGallery(this)" title="Sil">
@@ -172,7 +172,7 @@ function addImageToGallery(imageData, requestText) {
   // Görsel bilgisini sakla
   galleryImages.push({
     id: imageId,
-    data: imageData,
+    url: imageUrl,
     request: requestText,
     time: currentTime,
   });
@@ -233,22 +233,31 @@ function openImageModal(imageSrc, requestText = "", imageData = "") {
   };
 }
 
-// Görsel modal'ını kapat
-function closeImageModal() {
-  const modal = document.getElementById("image-modal");
-  modal.classList.remove("active");
-  currentModalImage = null;
-}
-
 // Mevcut modal görselini indir
 function downloadCurrentImage() {
-  if (currentModalImage && currentModalImage.data) {
+  if (currentModalImage && currentModalImage.src) {
     const filename = `boyama-sayfasi-${Date.now()}.png`;
-    downloadImage(currentModalImage.data, filename);
+    downloadImageFromUrl(currentModalImage.src, filename);
   }
 }
 
-// Görsel indir
+// URL'den görsel indir
+function downloadImageFromUrl(imageUrl, filename) {
+  try {
+    const link = document.createElement("a");
+    link.href = imageUrl;
+    link.download = filename;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Görsel indirme hatası:", error);
+    alert("Görsel indirilemedi. Lütfen tekrar deneyin.");
+  }
+}
+
+// Görsel indir (base64 için - eski sürümle uyumluluk)
 function downloadImage(base64Data, filename) {
   try {
     const link = document.createElement("a");
@@ -290,3 +299,10 @@ window.addEventListener("beforeunload", function (event) {
     event.returnValue = "Oluşturduğunuz görseller kaybolacak. Emin misiniz?";
   }
 });
+
+// Görsel modal'ını kapat
+function closeImageModal() {
+  const modal = document.getElementById("image-modal");
+  modal.classList.remove("active");
+  currentModalImage = null;
+}
