@@ -160,6 +160,101 @@ function displayUploadedFile(file) {
 
   uploadedFiles.appendChild(fileItem);
 }
+function sendPlanRequest() {
+    const message = document.getElementById('planMessage').value;
+    const date = document.getElementById('planDate').value;
+    const pdfFile = document.getElementById('pdfFile').files[0];
+    
+    if (!message.trim()) {
+        alert('Lütfen plan talebinizi yazın');
+        return;
+    }
+    
+    if (!date) {
+        alert('Lütfen plan tarihini seçin');
+        return;
+    }
+    
+    // Loading state
+    const sendButton = document.querySelector('.send-button');
+    const originalText = sendButton.textContent;
+    sendButton.textContent = 'Plan Oluşturuluyor...';
+    sendButton.disabled = true;
+    
+    // FormData oluştur
+    const formData = new FormData();
+    formData.append('message', message);
+    formData.append('date', date);
+    
+    // PDF dosyası varsa ekle
+    if (pdfFile) {
+        console.log('PDF dosyası yükleniyor:', pdfFile.name, pdfFile.type);
+        formData.append('pdf_file', pdfFile);
+    }
+    
+    // API çağrısı
+    fetch('/api/gunluk-plan', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayPlanResponse(data.response, data.date, data.has_pdf);
+            
+            // Formu temizle
+            document.getElementById('planMessage').value = '';
+            document.getElementById('planDate').value = '';
+            document.getElementById('pdfFile').value = '';
+            
+            // PDF dosya adını temizle
+            const fileNameSpan = document.querySelector('.file-name');
+            if (fileNameSpan) {
+                fileNameSpan.textContent = '';
+            }
+        } else {
+            alert('Hata: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('API Hatası:', error);
+        alert('Bir hata oluştu: ' + error.message);
+    })
+    .finally(() => {
+        // Button durumunu eski haline getir
+        sendButton.textContent = originalText;
+        sendButton.disabled = false;
+    });
+}
+
+// PDF dosya seçimi için event listener
+document.getElementById('pdfFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const fileNameSpan = document.querySelector('.file-name');
+    
+    if (file) {
+        if (file.type !== 'application/pdf') {
+            alert('Lütfen sadece PDF dosyası seçin');
+            e.target.value = '';
+            if (fileNameSpan) fileNameSpan.textContent = '';
+            return;
+        }
+        
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            alert('Dosya boyutu 10MB\'dan küçük olmalıdır');
+            e.target.value = '';
+            if (fileNameSpan) fileNameSpan.textContent = '';
+            return;
+        }
+        
+        if (fileNameSpan) {
+            fileNameSpan.textContent = file.name;
+        }
+        console.log('PDF dosyası seçildi:', file.name, file.type, file.size);
+    } else {
+        if (fileNameSpan) fileNameSpan.textContent = '';
+    }
+});
 
 // Yüklenen dosyayı kaldır
 function removeUploadedFile() {
