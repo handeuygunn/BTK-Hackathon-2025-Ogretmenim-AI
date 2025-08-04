@@ -1,11 +1,9 @@
-// Calendar JavaScript Functions
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 let selectedDate = null;
-let dailyPlans = []; // Günlük planları sakla
-let currentSelectedPlan = null; // Seçili planı sakla
+let dailyPlans = []; 
+let currentSelectedPlan = null; 
 
-// Ay isimleri (Türkçe)
 const months = [
   "Ocak",
   "Şubat",
@@ -326,7 +324,6 @@ async function deletePlan() {
   }
 }
 
-// Modal dışına tıklandığında kapat
 document.addEventListener("click", function (event) {
   const modal = document.getElementById("plan-modal");
   if (event.target === modal) {
@@ -334,7 +331,6 @@ document.addEventListener("click", function (event) {
   }
 });
 
-// ESC tuşu ile modal'ı kapat
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     closePlanModal();

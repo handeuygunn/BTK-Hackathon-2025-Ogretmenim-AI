@@ -1,8 +1,6 @@
-// Chatbot JavaScript Functions
 let currentCategory = "";
 let isTyping = false;
 
-// Chatbot modal'ını aç
 function openChatbot(category) {
   currentCategory = category;
   const modal = document.getElementById("chatbot-modal");
@@ -10,7 +8,6 @@ function openChatbot(category) {
   const title = document.getElementById("chatbot-title-text");
   const storyDisplay = document.getElementById("story-display");
 
-  // Kategori bazında başlık ve icon belirleme
   const categoryInfo = {
     "Günlük Plan": { icon: "📅", title: "Günlük Plan Asistanı" },
     "Etkinlik/Oyun Planı": { icon: "🎯", title: "Etkinlik Asistanı" },
@@ -23,7 +20,6 @@ function openChatbot(category) {
   const info = categoryInfo[category] || { icon: "🤖", title: "AI Asistan" };
   title.innerHTML = `<span class="icon">${info.icon}</span>${info.title}`;
 
-  // Hikayeler kategorisinde özel layout
   if (category === "Hikayeler") {
     container.classList.add("story-mode");
     storyDisplay.style.display = "flex";
@@ -76,7 +72,6 @@ function closeChatbot() {
   }, 300);
 }
 
-// Hoş geldin mesajını göster
 function showWelcomeMessage(category) {
   const welcomeMessages = {
     "Günlük Plan":

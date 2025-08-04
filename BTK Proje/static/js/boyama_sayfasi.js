@@ -1,21 +1,17 @@
-// Boyama Sayfası JavaScript Functions
 let isTyping = false;
 let imageCounter = 0;
 let galleryImages = [];
 let currentModalImage = null;
 
-// Sayfa yüklendiğinde çalışacak
 document.addEventListener("DOMContentLoaded", function () {
   // Input'a odaklan
   document.getElementById("chat-input").focus();
 });
 
-// Geri dön
 function goBack() {
   window.location.href = "/dashboard";
 }
 
-// Tümünü temizle
 function clearAll() {
   if (confirm("Tüm sohbet geçmişi ve görseller silinecek. Emin misiniz?")) {
     // Chat'i temizle
@@ -40,7 +36,6 @@ function clearAll() {
             </div>
         `;
 
-    // Değişkenleri sıfırla
     imageCounter = 0;
     galleryImages = [];
     updateImageCount();
@@ -54,11 +49,9 @@ async function sendMessage() {
 
   if (!message || isTyping) return;
 
-  // Kullanıcı mesajını ekle
   addMessage(message, "user");
   input.value = "";
 
-  // Yazıyor göstergesi
   showTypingIndicator();
 
   try {
@@ -79,7 +72,6 @@ async function sendMessage() {
     hideTypingIndicator();
 
     if (data.success) {
-      // Bot mesajını ekle
       addMessage(data.response, "bot");
 
       // Eğer görsel varsa galeriye ekle
@@ -124,11 +116,9 @@ function showTypingIndicator() {
   messagesContainer.appendChild(typingDiv);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-  // Send butonunu deaktif et
   document.getElementById("send-btn").disabled = true;
 }
 
-// Yazıyor göstergesini gizle
 function hideTypingIndicator() {
   isTyping = false;
   const typingIndicator = document.getElementById("typing-indicator");
@@ -142,7 +132,6 @@ function hideTypingIndicator() {
 
 // Görseli galeriye ekle
 function addImageToGallery(imageData, requestText) {
-  // Empty gallery mesajını kaldır
   const galleryContent = document.getElementById("gallery-content");
   const emptyGallery = galleryContent.querySelector(".empty-gallery");
   if (emptyGallery) {

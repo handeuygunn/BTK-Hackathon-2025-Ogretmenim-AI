@@ -1,5 +1,3 @@
-// Günlük Plan JavaScript
-
 let currentDate = new Date();
 let uploadedPDF = null;
 let currentPlan = null;
@@ -133,7 +131,6 @@ function handleFileUpload(file) {
   uploadedPDF = file;
   displayUploadedFile(file);
 
-  // Chat'e dosya yüklendiği bilgisini ekle
   addMessageToChat(
     `📄 "${file.name}" dosyası yüklendi. Artık bu dosyaya dayalı günlük plan oluşturabilirim.`,
     "bot"
@@ -706,7 +703,6 @@ function createSavedPlanItem(plan) {
 
 // Plan içeriğinden başlık çıkar
 function extractPlanTitle(content) {
-  // İlk h1 başlığını bul
   const match = content.match(/<h1>(.*?)<\/h1>|^#\s*(.*?)$/m);
   if (match) {
     return match[1] || match[2];

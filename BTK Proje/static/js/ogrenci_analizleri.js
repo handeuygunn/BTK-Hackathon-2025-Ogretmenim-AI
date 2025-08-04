@@ -1,6 +1,4 @@
-// Öğrenci Analizleri JavaScript
-
-let students = []; // Gerçek öğrenci verileri API'den gelecek
+let students = [];
 let selectedStudent = null;
 let currentNotes = [];
 
