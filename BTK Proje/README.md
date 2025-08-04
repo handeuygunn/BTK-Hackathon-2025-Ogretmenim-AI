@@ -2,7 +2,7 @@
 
 Modern Anaokulu Öğretmeni Yardımcı Asistanı
 
-## 🚀 Özellikler
+## Özellikler
 
 - **Modern Tasarım**: Kullanıcı dostu arayüz
 - **6'lı Grid Sistem**: Ana dashboard'da 6 farklı öğretmen aracı
