@@ -184,6 +184,8 @@ function switchTab(tabName) {
 
   // Progress tab'ına geçildiğinde gelişim analizini yükle
   if (tabName === "progress" && selectedStudent) {
+    // PDF export butonunu gizle (analiz yüklenene kadar)
+    document.getElementById("export-analysis-pdf-btn").style.display = "none";
     loadStudentProgress();
   }
 }
@@ -323,6 +325,15 @@ function displayStudentProgress(data) {
   `;
 
   progressContainer.innerHTML = progressHTML;
+
+  // PDF export butonunu göster
+  const pdfButton = document.getElementById("export-analysis-pdf-btn");
+  if (pdfButton) {
+    pdfButton.style.display = "inline-flex";
+    console.log("DEBUG: PDF export butonu gösterildi");
+  } else {
+    console.error("DEBUG: PDF export butonu bulunamadı!");
+  }
 
   // Progress bar animasyonları için delay ekle
   setTimeout(() => {
@@ -1006,4 +1017,211 @@ function showFormattedObservation(
     }
   };
   document.addEventListener("keydown", handleEscape);
+}
+
+// PDF'e aktar - Öğrenci Gelişim Analizi
+function exportAnalysisToPDF() {
+  if (!selectedStudent) {
+    alert("PDF'e aktarılacak öğrenci analizi bulunamadı.");
+    return;
+  }
+
+  const progressContainer = document.querySelector(
+    "#progress-tab .progress-cards"
+  );
+  if (!progressContainer || !progressContainer.innerHTML.trim()) {
+    alert("PDF'e aktarılacak analiz içeriği bulunamadı.");
+    return;
+  }
+
+  // Bugünün tarihini al
+  const today = new Date();
+  const dateStr = today.toLocaleDateString("tr-TR");
+
+  // Print penceresi aç
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>${selectedStudent.name} - Gelişim Analizi - ${dateStr}</title>
+        <meta charset="UTF-8">
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6;
+            color: #2d3748;
+          }
+          h1, h2, h3, h4 { 
+            color: #667eea; 
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+          }
+          h1 { 
+            border-bottom: 3px solid #667eea; 
+            padding-bottom: 15px; 
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+          }
+          h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+          }
+          h3 {
+            font-size: 1.5rem;
+            color: #4a5568;
+          }
+          h4 {
+            font-size: 1.3rem;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 3px solid #667eea;
+          }
+          .student-info {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border-left: 5px solid #667eea;
+          }
+          .date {
+            color: #718096;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+          }
+          .progress-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .progress-card h5 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 12px;
+            margin: 1rem 0;
+            overflow: hidden;
+          }
+          .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+          }
+          .progress-score {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4a5568;
+            text-align: right;
+            margin-top: 0.5rem;
+          }
+          .analysis-content {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            border-left: 5px solid #667eea;
+          }
+          .analysis-content h4 {
+            color: #667eea;
+            margin-top: 0;
+          }
+          ul, ol { 
+            margin: 1rem 0; 
+            padding-left: 2rem; 
+          }
+          li { 
+            margin-bottom: 0.5rem; 
+            line-height: 1.6;
+          }
+          strong { 
+            font-weight: 600; 
+            color: #2d3748;
+          }
+          p {
+            margin-bottom: 1rem;
+            text-align: justify;
+          }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+          .score-legend {
+            display: flex;
+            justify-content: space-around;
+            background: #f0f4f8;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+          }
+          .legend-item {
+            text-align: center;
+          }
+          .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 0 auto 0.5rem;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🤖 AI Gelişim Analizi Raporu</h1>
+          <div class="student-info">
+            <h3>${selectedStudent.name}</h3>
+            <div class="date">Rapor Tarihi: ${dateStr}</div>
+          </div>
+        </div>
+        
+        <div class="score-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #22c55e;"></div>
+            <div>Mükemmel (80-100)</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #eab308;"></div>
+            <div>İyi (60-79)</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f97316;"></div>
+            <div>Orta (40-59)</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ef4444;"></div>
+            <div>Geliştirilmeli (0-39)</div>
+          </div>
+        </div>
+        
+        <div class="content">
+          ${progressContainer.innerHTML}
+        </div>
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  // Kısa bir gecikme sonrasında print dialog'unu aç
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 250);
 }

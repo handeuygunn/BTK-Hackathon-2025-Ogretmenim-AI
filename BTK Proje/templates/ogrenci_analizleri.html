@@ -135,7 +135,20 @@
           <!-- Progress Tab -->
           <div class="tab-content" id="progress-tab">
             <div class="progress-container">
-              <h4>🤖 AI Gelişim Analizi</h4>
+              <div class="progress-header">
+                <h4>🤖 AI Gelişim Analizi</h4>
+                <div class="progress-actions">
+                  <button
+                    class="action-btn"
+                    id="export-analysis-pdf-btn"
+                    onclick="exportAnalysisToPDF()"
+                    style="display: none"
+                    title="PDF olarak dışa aktar"
+                  >
+                    <i class="fas fa-file-pdf"></i> PDF
+                  </button>
+                </div>
+              </div>
               <div class="progress-cards" id="progress-cards-container">
                 <!-- Progress kartları dinamik olarak yüklenecek -->
                 <div

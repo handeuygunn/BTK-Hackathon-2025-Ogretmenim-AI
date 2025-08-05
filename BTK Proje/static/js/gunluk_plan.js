@@ -387,7 +387,7 @@ function displayPlanOutput(planContent, date) {
   planContentDiv.innerHTML = `
         <div class="plan-output">
             <div class="plan-header">
-                <h1>📅 ${formatDate(date)} Günlük Planı</h1>
+                <h1>📅 Günlük Plan</h1>
             </div>
             ${formattedContent}
         </div>
