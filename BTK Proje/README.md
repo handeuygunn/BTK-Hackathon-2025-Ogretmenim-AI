@@ -1,6 +1,51 @@
 # Öğretmenim AI
 
-Modern Anaokulu Öğretmeni Yardımcı Asistanı
+Proje Tanıtımı:
+
+Bu proje, anaokulu öğretmenlerinin günlük planlama, yaratıcı içerik üretimi ve öğrenci gözlem süreçlerini dijitalleştirerek kolaylaştırmayı amaçlayan bir yapay zeka destekli asistan sistemidir. Google’ın Gemini büyük dil modeli (LLM) kullanılarak geliştirilen sistem, öğretmenin ihtiyaç duyduğu materyalleri otomatik olarak üretir. Kullanıcı ve içerik verileriyle birlikte öğrenci gözlemleri de PostgreSQL veritabanında güvenli şekilde saklanır. Sistem Python tabanlı bir API aracılığıyla çalışmakta, veritabanı ve yapay zeka bileşenleriyle entegre şekilde işlemektedir.
+
+Sistem Özellikleri:
+
+1. Günlük Planlama Asistanı
+Öğretmen ve asistan öğretmen, günlük eğitim planlarını sistem üzerinden kolaylıkla oluşturabilir.
+
+Planlar otomatik olarak takvime kaydedilir.
+
+Elle yazım ihtiyacı ortadan kalkar, planlama süresi ciddi oranda kısalır.
+
+Zaman tasarrufu sağlanarak öğretmenlerin öğrencilerle daha fazla birebir vakit geçirmesi mümkün hâle gelir.
+
+2. Yaratıcı Çalışma Asistanı
+Gemini modeli, öğretmenin seçtiği herhangi bir konuda özgün ve eğitici içerikler üretir.
+
+Boyama sayfaları, etkinlik dökümanları, çalışma kâğıtları gibi materyaller oluşturulur.
+
+İçerikler dijital ortamda ya da çıktı alınarak kullanılabilir; öğretim sürecine doğrudan entegre edilir.
+
+3. Öğrenci Analiz ve Gözlem Modülü
+Sistem, her öğrencinin günlük gelişim gözlemlerinin kaydedilmesini ve bu gözlemlerden otomatik raporlar üretilmesini sağlar.
+
+Öğretmenler, gözlemleri sisteme düzenli olarak girer.
+
+Bu gözlemler PostgreSQL veritabanında saklanır, böylece veri güvenliği ve kalıcılığı sağlanır.
+
+Otomatik raporlar sayesinde öğrencilerin bireysel gelişimi düzenli ve veri temelli biçimde takip edilebilir.
+
+4. Oyun Asistanı
+Öğretmenin belirlediği kurallar ve hedefler doğrultusunda özgün, öğretim hedeflerine uygun oyunlar oluşturulur.
+
+Oyunlar pedagojik hedeflerle uyumlu biçimde yapılandırılır.
+
+Oyun temelli öğrenmeyi destekler ve sınıf içi etkileşimi artırır.
+
+5. Hikâye Asistanı
+Öğretmenin seçtiği tema veya kazanıma uygun olarak hikâyeler otomatik şekilde oluşturulur.
+
+Hikâyeler, anlatı temelli öğrenmeye katkı sağlar.
+
+Dil gelişimi, değerler eğitimi ve sosyal-duygusal öğrenme alanlarında destekleyici bir araç olarak kullanılabilir.
+
+
 
 ## Özellikler
 
